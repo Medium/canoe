@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Stream.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page">
+            
+              
+              <a class="source" href="index.html">
+                index.js
+              </a>
+            
+              
+              <a class="source" href="Queue.html">
+                Queue.js
+              </a>
+            
+              
+              <a class="source" href="Stream.html">
+                Stream.js
+              </a>
+            
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>Stream.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> util = require(<span class="string">'util'</span>);
+<span class="keyword">var</span> Writable = require(<span class="string">'stream'</span>).Writable;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Load the <code>S3Queue</code> class</p>
+<p>S3Stream uses an internal instance of <code>S3Queue</code> to buffer chunks of
+data before they are sent to S3. <code>S3Queue</code> instances emit a <code>drain</code>
+event when data is ready to be sent, based on the queue&#39;s threshold.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> S3Queue = require(<span class="string">'./Queue'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <h2>S3Stream</h2>
+<p><em>Inherits <code>stream.Writable</code></em></p>
+<p>Creates a writable stream interface for S3.</p>
+<p>Arguments:</p>
+<ul>
+<li><code>params</code>: Accepts the same keys as <code>s3.createMultipartUpload()</code>.
+Requires <code>Bucket</code> and <code>Key</code>.</li>
+<li><code>s3</code>: An authenticated instance of <code>AWS.S3</code>.</li>
+</ul>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> S3Stream = module.exports = <span class="keyword">function</span>(params, s3) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Initialize the parent stream class</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  Writable.call(<span class="keyword">this</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Cache inputs</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">this</span>.params = params;
+  <span class="keyword">this</span>.s3 = s3;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Set the stream&#39;s initial state, create a queue, and bind event listeners</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">this</span>.init();
+};
+util.inherits(S3Stream, Writable);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <h3>Init</h3>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>S3Stream.prototype.init = <span class="keyword">function</span>() {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Setup the stream&#39;s initial state and limits</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">this</span>.uploadPartNumber = <span class="number">0</span>;
+  <span class="keyword">this</span>.uploadedParts = [];
+  <span class="keyword">this</span>.activeUploads = <span class="number">0</span>;
+  <span class="keyword">this</span>.maxActiveUploads = <span class="number">1</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Setup a queue instance</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">this</span>.setupQueue();</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Bind internal listners</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">this</span>.setupEvents();
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <h3>SetupQueue</h3>
+<p>Creates an instance of S3Queue and binds the stream&#39;s
+<code>upload()</code> method to the queue&#39;s <code>drain</code> event.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>S3Stream.prototype.setupQueue = <span class="keyword">function</span>() {
+  <span class="keyword">this</span>.queue = <span class="keyword">new</span> S3Queue();
+  <span class="keyword">this</span>.queue.on(<span class="string">'drain'</span>, <span class="keyword">this</span>.upload.bind(<span class="keyword">this</span>));
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <h3>SetupEvents</h3>
+<p>Bind internal events. Helps methods act more independently and
+keeps most communication in events instead of nested calls.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>S3Stream.prototype.setupEvents = <span class="keyword">function</span>() {
+  <span class="keyword">var</span> _<span class="keyword">this</span> = <span class="keyword">this</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Complete the upload when the stream&#39;s &#39;finish&#39; event fires</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">this</span>.once(<span class="string">'finish'</span>, <span class="keyword">this</span>.complete.bind(<span class="keyword">this</span>));</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>By default, abort the upload on any error. Unbind this event with:
+<code>s3stream.removeListener(&#39;error&#39;, s3stream.abort)</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">this</span>.on(<span class="string">'error'</span>, <span class="keyword">this</span>.abort.bind(<span class="keyword">this</span>));</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>When uploads complete, track the uploaded part and
+emit drain/flush events</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">this</span>.on(<span class="string">'uploaded'</span>, <span class="keyword">this</span>.trackUploadedPart.bind(<span class="keyword">this</span>));
+  <span class="keyword">this</span>.on(<span class="string">'uploaded'</span>, <span class="keyword">function</span>() {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>&#39;drain&#39; is emitted when the stream is writable</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (_<span class="keyword">this</span>.ready()) _<span class="keyword">this</span>.emit(<span class="string">'drain'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>&#39;flush&#39; is emitted when the stream has no active uploads</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="keyword">if</span> (_<span class="keyword">this</span>.activeUploads === <span class="number">0</span>) _<span class="keyword">this</span>.emit(<span class="string">'flush'</span>);
+  });
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <h3>_Write</h3>
+<p>This is the required method to extend <code>stream.Writable</code>. Accepts
+a <code>chunk</code> and calls <code>callback</code> when the write finishes. If
+<code>maxActiveUploads</code> are already active, the callback is called when
+the stream&#39;s <code>drain</code> event is emitted.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>S3Stream.prototype._write = <span class="keyword">function</span>(chunk, encoding, callback) {
+  <span class="keyword">var</span> _<span class="keyword">this</span> = <span class="keyword">this</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>On the queue&#39;s <code>push</code> event, fire the callback if the queue is ready
+for more data. If the queue is not ready, fire the callback on the
+queue&#39;s next <code>drain</code> event</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">this</span>.queue.once(<span class="string">'push'</span>, <span class="function"><span class="keyword">function</span> <span class="params">()</span> {</span>
+    <span class="keyword">return</span> _<span class="keyword">this</span>.ready() ? callback() : _<span class="keyword">this</span>.once(<span class="string">'drain'</span>, callback);
+  });</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>If the queue is initialized, push this chunk</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  <span class="keyword">if</span> (<span class="keyword">this</span>.initialized()) {
+    <span class="keyword">this</span>.queue.push(chunk);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>If the queue is not initialized yet, push this chunk when it fires
+its <code>writable</code> event</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>  } <span class="keyword">else</span> {
+    <span class="keyword">this</span>.once(<span class="string">'writable'</span>, <span class="keyword">function</span>() {
+      _<span class="keyword">this</span>.queue.push(chunk);
+    });
+  }
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <h3>Ready</h3>
+<p>Determine&#39;s whether or not the stream is ready to accept writes. The
+stream is ready when an <code>UploadId</code> param has been set (this happens when
+a multi-part upload is created on S3) and fewer than <code>maxActiveUploads</code>
+are running.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>S3Stream.prototype.ready = <span class="keyword">function</span>() {
+  <span class="keyword">return</span> !! (<span class="keyword">this</span>.initialized() &amp;&amp; <span class="keyword">this</span>.activeUploads &lt; <span class="keyword">this</span>.maxActiveUploads);
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h2">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <h2>Initialized</h2>
+<p>The stream requires an UploadId param before it can write any data</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>S3Stream.prototype.initialized = <span class="keyword">function</span>() {
+  <span class="keyword">return</span> !! <span class="keyword">this</span>.params.UploadId;
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <h3>Abort</h3>
+<p>Aborts a multi-part upload.</p>
+<p>S3 stores uploaded parts before the upload finishes and by default
+will change you for that storage regardless of whether the multi-part
+upload ever completes. Once an upload is aborted, its UploadId is
+no longer valid.</p>
+<p>By default, this method will be called when any error is emitted from
+the queue so that the zombie parts are not left hanging around S3.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>S3Stream.prototype.abort = <span class="keyword">function</span>() {
+  <span class="keyword">this</span>.params.UploadId = <span class="literal">null</span>;
+  <span class="keyword">this</span>.s3.abortMultipartUpload(<span class="keyword">this</span>.params).send();
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <h3>GetUploadParams</h3>
+<p>Helper to generate an object of params used by multiple
+S3 upload methods.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>S3Stream.prototype.getUploadParams = <span class="keyword">function</span>(extraParams) {
+  <span class="keyword">var</span> params = {
+    Bucket: <span class="keyword">this</span>.params.Bucket,
+    Key: <span class="keyword">this</span>.params.Key,
+    UploadId: <span class="keyword">this</span>.params.UploadId
+  };
+
+  Object.keys(extraParams || {}).forEach(<span class="keyword">function</span>(key) {
+    params[key] = extraParams[key];
+  });
+
+  <span class="keyword">return</span> params;
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <h3>Upload</h3>
+<p>Uploads a chunk of data to S3. The stream emits an <code>uploaded</code> event
+on completion with <code>err</code>, <code>response</code>, and <code>body</code> arguments.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>S3Stream.prototype.upload = <span class="keyword">function</span>(body) {
+  <span class="keyword">var</span> _<span class="keyword">this</span> = <span class="keyword">this</span>;
+  <span class="keyword">this</span>.uploadPartNumber++;
+
+  <span class="keyword">var</span> params = <span class="keyword">this</span>.getUploadParams({
+    Body: body,
+    PartNumber: <span class="keyword">this</span>.uploadPartNumber.toString()
+  });
+
+  <span class="keyword">this</span>.activeUploads++;
+  <span class="keyword">this</span>.s3.uploadPart(params, <span class="keyword">function</span>(err, response) {
+    _<span class="keyword">this</span>.activeUploads--;
+
+    <span class="keyword">if</span> (err) _<span class="keyword">this</span>.emit(<span class="string">'error'</span>, err);
+    _<span class="keyword">this</span>.emit(<span class="string">'uploaded'</span>, err, response, body);
+  });
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <h3>TrackUploadedPart</h3>
+<p>Maintains <code>ETag</code> and <code>PartNumber</code> data about each uploaded part so
+that the data can be combined when the upload is complete.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>S3Stream.prototype.trackUploadedPart = <span class="keyword">function</span>(err, data) {
+  <span class="keyword">if</span> (err) <span class="keyword">return</span>;
+
+  <span class="keyword">this</span>.uploadedParts.push({
+    ETag: data.ETag,
+    PartNumber: <span class="keyword">this</span>.uploadPartNumber
+  });
+};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap for-h3">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <h3>Complete</h3>
+<p>Finishes a multi-part upload. Any remaning data is flushed from the
+underlying queue. Once all parts have been uploaded to S3 and the
+<code>flush</code> event is fired, completion starts. The stream emits an <code>end</code>
+event when the completed upload finishes with <code>err</code> and <code>response</code>
+arguments.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>S3Stream.prototype.complete = <span class="keyword">function</span>() {
+  <span class="keyword">var</span> _<span class="keyword">this</span> = <span class="keyword">this</span>;
+
+  <span class="keyword">this</span>.queue.drain();
+  <span class="keyword">this</span>.once(<span class="string">'flush'</span>, <span class="keyword">function</span>() {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p>Parts have to be sorted in ascending order</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    _<span class="keyword">this</span>.uploadedParts.sort(<span class="keyword">function</span>(a, b) {
+      <span class="keyword">return</span> a.PartNumber &lt; b.PartNumber ? -<span class="number">1</span> : <span class="number">1</span>;
+    });
+
+    <span class="keyword">var</span> params = _<span class="keyword">this</span>.getUploadParams({
+      MultipartUpload: {Parts: _<span class="keyword">this</span>.uploadedParts}
+    });
+
+    _<span class="keyword">this</span>.s3.completeMultipartUpload(params, <span class="keyword">function</span>(err, response) {
+      <span class="keyword">if</span> (err) _<span class="keyword">this</span>.emit(<span class="string">'error'</span>, err);
+      _<span class="keyword">this</span>.emit(<span class="string">'end'</span>, err, response);
+    });
+  });
+};</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
