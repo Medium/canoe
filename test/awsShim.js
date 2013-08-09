@@ -181,7 +181,7 @@ describe('AWS Shim, testing the tests', function() {
             err.should.be.instanceof(Error);
             err.message.should.equal(key + ' is required');
             cb();
-          });        
+          });
         }, done);
       });
     });

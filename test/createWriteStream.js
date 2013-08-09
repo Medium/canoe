@@ -2,15 +2,14 @@ var fs = require('fs');
 var crypto = require('crypto');
 var should = require('should');
 
-// Overload the AWS library with the shim
-var proxyquire =  require('proxyquire');
+// Replace the AWS library with the shim
 var awsShim = require('./shim/aws');
-proxyquire.noCallThru().load('../index', { 'aws-sdk': awsShim });
+var createWriteStream = require('../index');
 
 var getStream = function(cb) {
   var s3Shim = new awsShim.S3();
   var params = {Bucket: 'test-bucket', Key: 'testkey.log'};
-  return s3Shim.createWriteStream(params, cb);
+  return createWriteStream(s3Shim, params, cb);
 };
 
 
