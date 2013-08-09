@@ -7,15 +7,18 @@ S3...get it?  Writable stream interface for AWS S3.
 ### Piping a large file
 ```javascript
 var fs = require('fs');
-require('simple-storage-streams');
 var s3 = new require('aws-sdk').S3;
+var createS3WriteStream = require('s3-write-stream');
 
 var maxMemory = 0;
 setInterval(function(){
   maxMemory = Math.max(maxMemory, process.memoryUsage().heapUsed);
 }, 100);
 
-var writeable = s3.createWriteStream({Bucket: 'random-access-memories', Key: 'instant-crush.log'});
+var writeable = createS3WriteStream(s3, {
+  Bucket: 'random-access-memories',
+  Key: 'instant-crush.log'
+});
 
 // Imagine you have some massive file you want to upload that doesn't fit into memory
 fs.createReadStream('./big-file.log').pipe(writeable);
@@ -31,9 +34,9 @@ writeable.on('end', function(data) {
 ```javascript
 // It doesn't matter what order you load the modules in
 var s3 = new require('aws-sdk').S3;
-require('simple-storage-streams');
+var createS3WriteStream = require('simple-storage-streams');
 
-var writeable = s3.createWriteStream({
+var writeable = createWriteStream(s3, {
   Bucket: 'random-access-memories',
   Key: 'instant.crush'
 });
