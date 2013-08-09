@@ -17,15 +17,15 @@ var S3Stream = require('./lib/Stream');
 // ```
 //
 // Arguments:
-// 
+//
 // * `s3`: Authenticated `AWS.S3` instance
 // * `params`: same params object as `AWS.S3.createMultipartUpload()`
 // * `callback`: Optional, called with `(err, writeableStream)`
-// 
+//
 // A writeable stream will be immediately returned, but the stream will not
 // be ready yet. An upload ID must be retrieved from S3 before the stream
 // will be ready. You can handle this in a few ways:
-// 
+//
 // * Wait for the stream to emit a `writable` event
 // * Provide a callback, which will be called with `(err, writeableStream)`
 //   when the stream is ready
