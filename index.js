@@ -3,46 +3,38 @@
 // Loads the base S3Stream class, which extends `stream.Writable`.
 var S3Stream = require('./lib/Stream');
 
-// ## AWS SDK
-//
-// Load and export the AWS SDK. We will monkeypatch `AWS.S3's.prototype`.
-//
-// This module requires the AWS SDK module as a peer dependency, so it
-// must be present in the parent package.
-var AWS = require('aws-sdk');
-module.exports = AWS;
-
 // ## CreateWriteStream
 //
-// Define `AWS.S3.prototype.createWriteStream`.
-// 
 // Usage:
 //
 // ```
-// require('s3-write-stream');
 // var AWS = require('aws-sdk');
 // var s3 = new AWS.S3(configParams);
+// var createS3WriteStream = require('s3-write-stream');
 // var targetFile = {Bucket: 'random-access-memories', Key: 'to-get-lucky.log'};
-// var s3stream = s3.createWriteStream(targetFile);;
+// var s3stream = createS3WriteStream(s3, targetFile);;
 // fs.createReadStream('./for-good-fun.log').pipe(s3stream);
 // ```
 //
-// `createWriteStream()` accepts the same params object as
-// `s3.createMultipartUpload()`.
-// 
-// It will immediately return a writeable stream, but the stream will not
+// Arguments:
+//
+// * `s3`: Authenticated `AWS.S3` instance
+// * `params`: same params object as `AWS.S3.createMultipartUpload()`
+// * `callback`: Optional, called with `(err, writeableStream)`
+//
+// A writeable stream will be immediately returned, but the stream will not
 // be ready yet. An upload ID must be retrieved from S3 before the stream
 // will be ready. You can handle this in a few ways:
-// 
+//
 // * Wait for the stream to emit a `writable` event
 // * Provide a callback, which will be called with `(err, writeableStream)`
 //   when the stream is ready
 // * Start writing immediately and respect `false` return values. This is how
 //   Node's `stream.pipe()` behaves
-AWS.S3.prototype.createWriteStream = function(params, callback) {
-  var s3stream = new S3Stream(params, this);
+module.exports = function(s3, params, callback) {
+  var s3stream = new S3Stream(params, s3);
 
-  this.createMultipartUpload(params, function(err, data) {
+  s3.createMultipartUpload(params, function(err, data) {
     // Default callback to a noop
     callback = callback || function(){};
 
