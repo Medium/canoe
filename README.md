@@ -36,7 +36,7 @@ writeable.on('end', function(data) {
 var s3 = new require('aws-sdk').S3;
 var createS3WriteStream = require('simple-storage-streams');
 
-var writeable = createWriteStream(s3, {
+var writeable = createS3WriteStream(s3, {
   Bucket: 'random-access-memories',
   Key: 'instant.crush'
 });
