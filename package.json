@@ -11,7 +11,10 @@
     "test": "mocha test/*.js --reporter spec --check-leaks"
   },
   "author": "Evan Solomon <evan@evansolomon.me>",
-  "license": "MIT",
+  "license": {
+    "type": "Apache 2.0",
+    "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+  },
   "keywords": [
     "aws",
     "s3",
