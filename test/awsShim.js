@@ -1,3 +1,5 @@
+// Copyright 2013 The Obvious Corporation.
+
 var async = require('async');
 var should = require('should');
 

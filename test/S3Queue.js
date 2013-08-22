@@ -1,3 +1,5 @@
+// Copyright 2012 The Obvious Corporation.
+
 var events = require('events');
 var crypto = require('crypto');
 var S3Queue = require('../lib/queue');
