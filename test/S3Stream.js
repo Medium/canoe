@@ -1,3 +1,5 @@
+// Copyright 2013 The Obvious Corporation.
+
 var stream = require('stream');
 var crypto = require('crypto');
 

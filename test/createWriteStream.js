@@ -1,3 +1,5 @@
+// Copyright 2013 The Obvious Corporation.
+
 var fs = require('fs');
 var crypto = require('crypto');
 var should = require('should');
