@@ -1,3 +1,5 @@
+// Copyright 2013 The Obvious Corporation.
+
 // Testable shim for the AWS SDK
 //
 // Stubs all of the AWS methods that the stream uses

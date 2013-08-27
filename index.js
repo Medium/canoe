@@ -1,3 +1,5 @@
+// Copyright 2013 The Obvious Corporation.
+
 // ## Load S3Stream
 //
 // Loads the base S3Stream class, which extends `stream.Writable`.

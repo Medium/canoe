@@ -6,12 +6,31 @@
   },
   "engineStrict": true,
   "description": "Write objects to S3 as a Node.js 0.10-friendly stream",
+  "homepage": "https://github.com/Obvious/simple-storage-streams",
   "main": "index.js",
   "scripts": {
     "test": "mocha test/*.js --reporter spec --check-leaks"
   },
-  "author": "Evan Solomon <evan@evansolomon.me>",
-  "license": "MIT",
+  "author": {
+    "name": "Evan Solomon",
+    "email": "evan.solomon@medium.com",
+    "url": "http://evansolomon.me"
+  },
+  "maintainers": [
+    {
+      "name": "Evan Solomon",
+      "email": "evan.solomon@medium.com",
+      "url": "http://evansolomon.me"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Obvious/simple-storage-streams.git"
+  },
+  "license": {
+    "type": "Apache 2.0",
+    "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+  },
   "keywords": [
     "aws",
     "s3",
