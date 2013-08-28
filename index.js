@@ -1,5 +1,23 @@
 // Copyright 2013 The Obvious Corporation.
 
+// ## S3 Utils
+//
+// Arguments:
+//
+// * `s3`: Authenticated `AWS.S3` instance
+//
+// Usage:
+//
+// ```
+// var AWS = require('aws-sdk');
+// var s3 = new AWS.S3(configParams);
+// var s3Utils = new S3Utils(s3);
+// ```
+
+var S3Utils = module.exports = function(s3) {
+  this.s3 = s3;
+};
+
 // ## Load S3Stream
 //
 // Loads the base S3Stream class, which extends `stream.Writable`.
@@ -10,17 +28,13 @@ var S3Stream = require('./lib/Stream');
 // Usage:
 //
 // ```
-// var AWS = require('aws-sdk');
-// var s3 = new AWS.S3(configParams);
-// var createS3WriteStream = require('s3-write-stream');
-// var targetFile = {Bucket: 'random-access-memories', Key: 'to-get-lucky.log'};
-// var s3stream = createS3WriteStream(s3, targetFile);;
+// var s3stream = s3Utils.createWriteStream({
+//   Bucket: 'random-access-memories',
+//   Key: 'to-get-lucky.log'
+// });;
 // fs.createReadStream('./for-good-fun.log').pipe(s3stream);
 // ```
 //
-// Arguments:
-//
-// * `s3`: Authenticated `AWS.S3` instance
 // * `params`: same params object as `AWS.S3.createMultipartUpload()`
 // * `callback`: Optional, called with `(err, writeableStream)`
 //
@@ -33,10 +47,10 @@ var S3Stream = require('./lib/Stream');
 //   when the stream is ready
 // * Start writing immediately and respect `false` return values. This is how
 //   Node's `stream.pipe()` behaves
-module.exports = function(s3, params, callback) {
-  var s3stream = new S3Stream(params, s3);
+S3Utils.prototype.createWriteStream = function(params, callback) {
+  var s3stream = new S3Stream(params, this.s3);
 
-  s3.createMultipartUpload(params, function(err, data) {
+  this.s3.createMultipartUpload(params, function(err, data) {
     // Default callback to a noop
     callback = callback || function(){};
 
