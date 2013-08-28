@@ -1,16 +1,32 @@
-# Simple Storage Streams
+# S3 Utils
 
-A Node 0.10-friendly writable stream interface ("streams2") for uploading objects to S3. Built on the [AWS Node SDK](https://github.com/aws/aws-sdk-js).
-
-Simple Storage Streams. S3...get it?
+S3's missing utilities for Node.js. Built on the [AWS Node SDK](https://github.com/aws/aws-sdk-js).
 
 ## Install
 
-`npm install simple-storage-streams --save`
+`npm install s3-utils --save`
 
 ## Usage
 
-The module exposes a function that creates a writable stream for a given S3 bucket/key. To create the stream, you *must* provide an instance of `AWS.S3`. The stream will be returned immediately and also passed to an optional callback.
+Create a new `s3Utils` instance by passing an instance of `AWS.S3` from the `aws-sdk` module.
+
+```javascript
+var AWS = require('aws-sdk'),
+  S3Utils = require('s3-utils');
+
+var s3 = new AWS.S3();
+var s3utils = new S3Utils(s3);
+```
+
+## Methods
+
+### createWriteStream
+
+A Node 0.10-friendly writable stream interface ("streams2") for uploading objects to S3.
+
+#### Usage
+
+Creates a writable stream for a given S3 bucket/key. The stream will be returned immediately and also passed to an optional callback.
 
 The stream will be writable when it's returned, but not actually ready to send data to S3 yet (data will be buffered internally in the meantime). If you use the immediately returned stream, be sure to respect `false`-y return values, as Node's `readable.pipe()` does. The stream will be fully ready when the callback is run.
 
@@ -25,10 +41,7 @@ writableStream.write(stuff);
 writableStream.end();
 ```
 
-
-## Examples
-
-### Piping a large file
+#### Example: Piping a large file
 
 ```javascript
 var fs = require('fs'),
@@ -60,7 +73,7 @@ writeable.on('end', function(data) {
 fs.createReadStream('./random-access-memories.log').pipe(writeable);
 ```
 
-### Writing chunks of data
+#### Example: Writing chunks of data
 
 ```javascript
 var AWS = require('aws-sdk'),

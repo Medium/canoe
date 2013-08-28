@@ -6,12 +6,13 @@ var should = require('should');
 
 // Replace the AWS library with the shim
 var awsShim = require('./shim/aws');
-var createWriteStream = require('../index');
+var S3Utils = require('../index');
 
 var getStream = function(cb) {
   var s3Shim = new awsShim.S3();
+  var s3Utils = new S3Utils(s3Shim);
   var params = {Bucket: 'test-bucket', Key: 'testkey.log'};
-  return createWriteStream(s3Shim, params, cb);
+  return s3Utils.createWriteStream(params, cb);
 };
 
 
