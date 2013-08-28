@@ -1,6 +1,4 @@
 module.exports = function(grunt) {
-  grunt.loadNpmTasks('grunt-docco-multi');
-  grunt.loadNpmTasks('grunt-gh-pages');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-exec');
   grunt.loadNpmTasks('grunt-contrib-watch');
@@ -9,7 +7,7 @@ module.exports = function(grunt) {
     watch: {
       module: {
         files: ['index.js', 'lib/*'],
-        tasks: ['default', 'docco']
+        tasks: 'default'
       },
       tests: {
         files: ['test/**/*'],
@@ -24,19 +22,7 @@ module.exports = function(grunt) {
     jshint: {
       files: ['index.js', 'lib/*.js']
     },
-    'gh-pages': {
-      src: ['*'],
-      options: {
-        base: 'docs'
-      }
-    },
-    docco: {
-      files: {
-        src: ['index.js', 'lib/*']
-      }
-    }
   });
 
   grunt.registerTask('default', ['jshint', 'exec:test']);
-  grunt.registerTask('gh-docs', ['docco', 'gh-pages']);
 };
