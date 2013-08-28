@@ -14,9 +14,10 @@
 // var s3Utils = new S3Utils(s3);
 // ```
 
-var S3Utils = module.exports = function(s3) {
+function S3Utils(s3) {
   this.s3 = s3;
-};
+}
+module.exports = S3Utils;
 
 // ## Load S3Stream
 //
@@ -47,10 +48,10 @@ var S3Stream = require('./lib/Stream');
 //   when the stream is ready
 // * Start writing immediately and respect `false` return values. This is how
 //   Node's `stream.pipe()` behaves
-S3Utils.prototype.createWriteStream = function(params, callback) {
+S3Utils.prototype.createWriteStream = function (params, callback) {
   var s3stream = new S3Stream(params, this.s3);
 
-  this.s3.createMultipartUpload(params, function(err, data) {
+  this.s3.createMultipartUpload(params, function (err, data) {
     // Default callback to a noop
     callback = callback || function(){};
 
