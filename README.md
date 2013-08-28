@@ -35,8 +35,10 @@ The stream will emit a `writable` event when it's ready to send data to S3.
 Basic usage:
 
 ```javascript
-var createS3Stream = require('simple-storage-streams');
-var writableStream = createS3Stream(s3Instance, {Bucket: 'bucket-name', Key: 'file/name'});
+var writableStream = s3Utils.createWriteStream({
+  Bucket: 'bucket-name',
+  Key: 'file/name'
+});
 writableStream.write(stuff);
 writableStream.end();
 ```
@@ -44,13 +46,8 @@ writableStream.end();
 #### Example: Piping a large file
 
 ```javascript
-var fs = require('fs'),
-  AWS = require('aws-sdk'),
-  s3 = new AWS.S3,
-  createS3WriteStream = require('s3-write-stream');
-
 // Create a stream and use it immediately
-var writeable = createS3WriteStream(s3, {
+var writeable = s3Utils.createS3WriteStream({
   Bucket: 'random-access-memories',
   Key: 'instant.crush'
 });
@@ -76,13 +73,9 @@ fs.createReadStream('./random-access-memories.log').pipe(writeable);
 #### Example: Writing chunks of data
 
 ```javascript
-var AWS = require('aws-sdk'),
-  s3 = new AWS.S3,
-  createS3WriteStream = require('simple-storage-streams');
-
 // Create a stream and wait to use it in a callback
 var s3Params = {Bucket: 'random-access-memories', Key: 'instant.crush'};
-createS3WriteStream(s3, s3Params, function(err, writable) {
+s3Utils.createWriteStream(s3Params, function(err, writable) {
   if (err) return;
 
   writable.write("And we will never be alone again\n");
