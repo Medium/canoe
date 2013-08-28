@@ -32,7 +32,7 @@ var S3Stream = require('./lib/Stream');
 // var s3stream = s3Utils.createWriteStream({
 //   Bucket: 'random-access-memories',
 //   Key: 'to-get-lucky.log'
-// });;
+// });
 // fs.createReadStream('./for-good-fun.log').pipe(s3stream);
 // ```
 //
