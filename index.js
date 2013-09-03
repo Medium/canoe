@@ -5,7 +5,7 @@ var S3Stream = require('./lib/Stream');
 /**
  * Helper functionality for working with S3.
  *
- * Usage:
+ * @example
  *   var AWS = require('aws-sdk');
  *   var s3 = new AWS.S3(configParams);
  *   var s3Utils = new S3Utils(s3);
@@ -22,7 +22,7 @@ module.exports = S3Utils;
 /**
  * Create a writable stream to upload an object to S3.
  *
- * Usage:
+ * @example
  *   var s3Utils = new S3Utils(s3);
  *   var s3stream = s3Utils.createWriteStream({
  *     Bucket: 'random-access-memories',
