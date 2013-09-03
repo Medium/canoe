@@ -30,6 +30,9 @@ module.exports = S3Utils;
  *   });
  *   fs.createReadStream('./for-good-fun.log').pipe(s3stream);
  *
+ * @fires S3Utils#writable
+ * @fires S3Utils#error
+ *
  * @param {Object} params Params to create an instance of S3Stream
  * @param {Function=} callback Called when the stream is ready.
  * @return {Stream} Writable stream
@@ -43,6 +46,12 @@ S3Utils.prototype.createWriteStream = function (params, callback) {
 
     // Pass errors to the callback and emit them from the stream
     if (err) {
+      /**
+       * Error event.
+       *
+       * @event S3Utils#error
+       * @type {Error}
+       */
       s3stream.emit('error', err);
       return callback(err);
     }
@@ -53,8 +62,11 @@ S3Utils.prototype.createWriteStream = function (params, callback) {
     // Run the callback
     callback(null, s3stream);
 
-    // Fire the 'writable' event after the callback, in case the callback is
-    // mistakenly waiting for the event.
+    /**
+     * S3 stream is writable.
+     *
+     * @event S3Utils#writable
+     */
     s3stream.emit('writable');
   });
 
