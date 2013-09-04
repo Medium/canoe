@@ -9,7 +9,8 @@
   "homepage": "https://github.com/Obvious/simple-storage-streams",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/*.js --reporter spec --check-leaks"
+    "test": "mocha test/*.js --reporter spec --check-leaks",
+    "prepublish": "grunt prepublish"
   },
   "author": {
     "name": "Evan Solomon",

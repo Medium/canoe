@@ -53,4 +53,5 @@ module.exports = function(grunt) {
 
   grunt.registerTask('default', ['jshint', 'exec:test', 'docs']);
   grunt.registerTask('docs', ['jsdoc:docs', 'exec:docsIndex']);
+  grunt.registerTask('prepublish', ['default', 'gh-pages']);
 };
