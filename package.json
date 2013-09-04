@@ -1,12 +1,12 @@
 {
-  "name": "s3-utils",
+  "name": "canoe",
   "version": "0.1.0",
   "engines": {
     "node": ">=0.10.0"
   },
   "engineStrict": true,
-  "description": "Write objects to S3 as a Node.js 0.10-friendly stream",
-  "homepage": "https://github.com/Obvious/simple-storage-streams",
+  "description": "S3 utility library",
+  "homepage": "https://github.com/Obvious/canoe",
   "main": "index.js",
   "scripts": {
     "test": "mocha test/*.js --reporter spec --check-leaks",
@@ -26,7 +26,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Obvious/simple-storage-streams.git"
+    "url": "https://github.com/Obvious/canoe.git"
   },
   "license": {
     "type": "Apache 2.0",
