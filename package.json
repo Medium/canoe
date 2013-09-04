@@ -1,15 +1,16 @@
 {
   "name": "s3-utils",
   "version": "0.1.0",
-  "engines" : {
-    "node" : ">=0.10.0"
+  "engines": {
+    "node": ">=0.10.0"
   },
   "engineStrict": true,
   "description": "Write objects to S3 as a Node.js 0.10-friendly stream",
   "homepage": "https://github.com/Obvious/simple-storage-streams",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test/*.js --reporter spec --check-leaks"
+    "test": "mocha test/*.js --reporter spec --check-leaks",
+    "prepublish": "grunt prepublish"
   },
   "author": {
     "name": "Evan Solomon",
@@ -47,6 +48,8 @@
     "grunt-contrib-jshint": "~0.6.2",
     "async": "~0.2.9",
     "grunt-exec": "~0.4.2",
-    "grunt-contrib-watch": "~0.5.1"
+    "grunt-contrib-watch": "~0.5.1",
+    "grunt-jsdoc": "~0.4.0",
+    "grunt-gh-pages": "~0.7.1"
   }
 }
