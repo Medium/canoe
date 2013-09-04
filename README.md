@@ -1,21 +1,21 @@
-# S3 Utils
+# Canoe
 
-S3's missing utilities for Node.js. Built on the [AWS Node SDK](https://github.com/aws/aws-sdk-js).
+Paddle downstream with Canoe, an S3 utility library for Node.js. Built on the [AWS Node SDK](https://github.com/aws/aws-sdk-js).
 
 ## Install
 
-`npm install s3-utils --save`
+`npm install canoe --save`
 
 ## Usage
 
-Create a new `s3Utils` instance by passing an instance of `AWS.S3` from the `aws-sdk` module.
+Create a new `Canoe` instance by passing an instance of `AWS.S3` from the `aws-sdk` module.
 
 ```javascript
 var AWS = require('aws-sdk'),
-  S3Utils = require('s3-utils');
+  Canoe = require('canoe');
 
 var s3 = new AWS.S3();
-var s3utils = new S3Utils(s3);
+var canoe = new Canoe(s3);
 ```
 
 ## Methods
@@ -35,7 +35,7 @@ The stream will emit a `writable` event when it's ready to send data to S3.
 Basic usage:
 
 ```javascript
-var writableStream = s3Utils.createWriteStream({
+var writableStream = canoe.createWriteStream({
   Bucket: 'bucket-name',
   Key: 'file/name'
 });
@@ -47,7 +47,7 @@ writableStream.end();
 
 ```javascript
 // Create a stream and use it immediately
-var writeable = s3Utils.createS3WriteStream({
+var writeable = canoe.createS3WriteStream({
   Bucket: 'random-access-memories',
   Key: 'instant.crush'
 });
@@ -75,7 +75,7 @@ fs.createReadStream('./random-access-memories.log').pipe(writeable);
 ```javascript
 // Create a stream and wait to use it in a callback
 var s3Params = {Bucket: 'random-access-memories', Key: 'instant.crush'};
-s3Utils.createWriteStream(s3Params, function(err, writable) {
+canoe.createWriteStream(s3Params, function(err, writable) {
   if (err) return;
 
   writable.write("And we will never be alone again\n");
@@ -98,7 +98,7 @@ Tests use Mocha, and can be run with `npm test`. For development, you should run
 
 ## Contributing
 
-Questions, comments, bug reports, and pull requests are all welcome.  Submit them at [the project on GitHub](https://github.com/Obvious/simple-storage-streams/).  If you haven't contributed to an [Obvious](http://github.com/Obvious/) project before please head over to the [Open Source Project](https://github.com/Obvious/open-source#note-to-external-contributors) and fill out an OCLA (it should be pretty painless).
+Questions, comments, bug reports, and pull requests are all welcome.  Submit them at [the project on GitHub](https://github.com/Obvious/canoe/).  If you haven't contributed to an [Obvious](http://github.com/Obvious/) project before please head over to the [Open Source Project](https://github.com/Obvious/open-source#note-to-external-contributors) and fill out an OCLA (it should be pretty painless).
 
 Bug reports that include steps-to-reproduce (including code) are the best. Even better, make them in the form of pull requests.
 

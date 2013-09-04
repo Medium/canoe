@@ -8,23 +8,23 @@ var S3Stream = require('./lib/Stream');
  * @example
  *   var AWS = require('aws-sdk');
  *   var s3 = new AWS.S3(configParams);
- *   var s3Utils = new S3Utils(s3);
+ *   var canoe = new Canoe(s3);
  *
  * @constructor
  * @param {Object} s3 Authenticated instance of AWS.S3
  */
-function S3Utils(s3) {
+function Canoe(s3) {
   this.s3 = s3;
 }
-module.exports = S3Utils;
+module.exports = Canoe;
 
 
 /**
  * Create a writable stream to upload an object to S3.
  *
  * @example
- *   var s3Utils = new S3Utils(s3);
- *   var s3stream = s3Utils.createWriteStream({
+ *   var canoe = new Canoe(s3);
+ *   var s3stream = canoe.createWriteStream({
  *     Bucket: 'random-access-memories',
  *     Key: 'to-get-lucky.log'
  *   });
@@ -34,7 +34,7 @@ module.exports = S3Utils;
  * @param {Function=} callback Called when the stream is ready.
  * @return {Stream} Writable stream
  */
-S3Utils.prototype.createWriteStream = function (params, callback) {
+Canoe.prototype.createWriteStream = function (params, callback) {
   var s3stream = new S3Stream(params, this.s3);
 
   this.s3.createMultipartUpload(params, function (err, data) {
