@@ -43,7 +43,7 @@ module.exports = function(grunt) {
       docsIndex: {
         // The default index page is mostly empty and confusing
         // This sets it to use the main class' docs
-        command: 'cp ' + [path.join(docsRoot, 'S3Utils.html'), path.join(docsRoot, 'index.html')].join(' ')
+        command: 'cp ' + [path.join(docsRoot, 'Canoe.html'), path.join(docsRoot, 'index.html')].join(' ')
       }
     },
     jshint: {
