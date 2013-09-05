@@ -1,5 +1,7 @@
 # Canoe
 
+[![Build Status](https://secure.travis-ci.org/Obvious/canoe.png)](http://travis-ci.org/Obvious/canoe)
+
 Paddle downstream with Canoe, an S3 utility library for Node.js. Built on the [AWS Node SDK](https://github.com/aws/aws-sdk-js).
 
 ## Install
