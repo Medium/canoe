@@ -2,7 +2,7 @@
 
 var events = require('events');
 var crypto = require('crypto');
-var S3Queue = require('../lib/queue');
+var S3Queue = require('../lib/Queue');
 var should = require('should');
 
 // Compute this here so Mocha doesn't get annoyed by a slow test
