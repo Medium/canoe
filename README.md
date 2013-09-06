@@ -93,16 +93,9 @@ canoe.createWriteStream(s3Params, function(err, writable) {
 ```
 
 
-## Testing
-
-Tests use Mocha, and can be run with `npm test`. For development, you should run `grunt watch` to automatically run tests, run JS Hint, and update documentaiton.
-
-
 ## Contributing
 
-Questions, comments, bug reports, and pull requests are all welcome.  Submit them at [the project on GitHub](https://github.com/Obvious/canoe/).  If you haven't contributed to an [Obvious](http://github.com/Obvious/) project before please head over to the [Open Source Project](https://github.com/Obvious/open-source#note-to-external-contributors) and fill out an OCLA (it should be pretty painless).
-
-Bug reports that include steps-to-reproduce (including code) are the best. Even better, make them in the form of pull requests.
+See the [contributing documentation](https://github.com/Obvious/canoe/tree/master/CONTRIBUTING.md).
 
 ## Author
 
