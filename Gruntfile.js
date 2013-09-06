@@ -8,6 +8,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-jsdoc');
   grunt.loadNpmTasks('grunt-gh-pages');
   grunt.loadNpmTasks('grunt-benchmark');
+  grunt.loadNpmTasks('grunt-release');
 
   grunt.initConfig({
     watch: {
@@ -54,10 +55,14 @@ module.exports = function(grunt) {
     },
     jshint: {
       files: ['index.js', 'lib/*.js']
-    },
+    }
   });
 
   grunt.registerTask('default', ['jshint', 'exec:test', 'docs']);
   grunt.registerTask('docs', ['jsdoc:docs', 'exec:docsIndex']);
-  grunt.registerTask('prepublish', ['default', 'gh-pages']);
+
+  grunt.registerTask('publish', 'Publish a new version, defaults to patch', function (type) {
+    if (! type) type = 'patch';
+    grunt.task.run('default', 'release:' + type, 'gh-pages');
+  });
 };
