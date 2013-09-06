@@ -49,7 +49,7 @@ writableStream.end();
 
 ```javascript
 // Create a stream and use it immediately
-var writeable = canoe.createS3WriteStream({
+var writeable = canoe.createWriteStream({
   Bucket: 'random-access-memories',
   Key: 'instant.crush'
 });
