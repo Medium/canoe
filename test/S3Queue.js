@@ -22,7 +22,7 @@ describe('S3Queue', function() {
 
   it('Should set initial state', function() {
     var q = new S3Queue();
-    q.buffer.toString().should.equal('');
+    q.chunks.toString().should.equal('');
   });
 
   it('Should add chunk', function(done) {
@@ -44,7 +44,7 @@ describe('S3Queue', function() {
     var nextChunk = new Buffer("and it isn't stopping");
     q.push(nextChunk);
 
-    q.buffer.toString().should.equal("I know your life is speeding and it isn't stopping");
+    q.chunks.join('').should.equal("I know your life is speeding and it isn't stopping");
   });
 
   it('Should drain when full', function(done) {
