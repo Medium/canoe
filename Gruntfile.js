@@ -1,14 +1,14 @@
 module.exports = function(grunt) {
-  var path = require('path');
-  var docsRoot = '.grunt/docs';
+  var path = require('path')
+  var docsRoot = '.grunt/docs'
 
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-exec');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-jsdoc');
-  grunt.loadNpmTasks('grunt-gh-pages');
-  grunt.loadNpmTasks('grunt-benchmark');
-  grunt.loadNpmTasks('grunt-release');
+  grunt.loadNpmTasks('grunt-contrib-jshint')
+  grunt.loadNpmTasks('grunt-exec')
+  grunt.loadNpmTasks('grunt-contrib-watch')
+  grunt.loadNpmTasks('grunt-jsdoc')
+  grunt.loadNpmTasks('grunt-gh-pages')
+  grunt.loadNpmTasks('grunt-benchmark')
+  grunt.loadNpmTasks('grunt-release')
 
   grunt.initConfig({
     watch: {
@@ -56,13 +56,13 @@ module.exports = function(grunt) {
     jshint: {
       files: ['index.js', 'lib/*.js']
     }
-  });
+  })
 
-  grunt.registerTask('default', ['jshint', 'exec:test', 'docs']);
-  grunt.registerTask('docs', ['jsdoc:docs', 'exec:docsIndex']);
+  grunt.registerTask('default', ['jshint', 'exec:test', 'docs'])
+  grunt.registerTask('docs', ['jsdoc:docs', 'exec:docsIndex'])
 
   grunt.registerTask('publish', 'Publish a new version, defaults to patch', function (type) {
-    if (! type) type = 'patch';
-    grunt.task.run('default', 'release:' + type, 'gh-pages');
-  });
-};
+    if (! type) type = 'patch'
+    grunt.task.run('default', 'release:' + type, 'gh-pages')
+  })
+}
