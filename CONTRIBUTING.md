@@ -20,7 +20,7 @@ During development, you can run `grunt watch` to automatically run tests, run JS
 
 There is no formal style guide, but your code should pass JS Hint (part of the default `grunt` task). When in doubt, try to follow existing convenetions and these basic rules:
 
-* Use semi-colons, even though they're optional.
+* Don't use semi-colons. We think our code looks sleeker without them.
 * Indent using two spaces. Never use tabs.
 * Delete trailing whitespace. It's ugly.
 * Use spaces after the `function` keyword, like this: `function () {}`
