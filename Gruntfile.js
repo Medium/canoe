@@ -7,6 +7,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-jsdoc');
   grunt.loadNpmTasks('grunt-gh-pages');
+  grunt.loadNpmTasks('grunt-benchmark');
 
   grunt.initConfig({
     watch: {
@@ -17,6 +18,11 @@ module.exports = function(grunt) {
       tests: {
         files: ['test/**/*'],
         tasks: 'exec:test'
+      }
+    },
+    benchmark: {
+      all: {
+        src: 'benchmark/**/*.js'
       }
     },
     jsdoc: {
