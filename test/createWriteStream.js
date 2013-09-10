@@ -58,6 +58,17 @@ describe('S3 createWriteStream', function() {
     })
   })
 
+  it('Should error on writes after end', function(done) {
+    getStream(function(err, stream) {
+      stream.end("'Cause it doesn't happen every day")
+
+      stream.write('Rewind', function(err) {
+        err.should.be.instanceof(Error)
+        done()
+      })
+    })
+  })
+
   it('Should write data', function(done) {
     getStream(function(err, stream) {
       var lyric = "Kinda counted on you being a friend"
