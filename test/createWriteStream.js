@@ -58,16 +58,6 @@ describe('S3 createWriteStream', function() {
     })
   })
 
-  it('Should emit "end" event after finish event', function(done) {
-    getStream(function(err, stream) {
-      stream.on('finish', function() {
-        stream.on('end', done)
-      })
-
-      stream.end("Kinda given up on giving away")
-    })
-  })
-
   it('Should write data', function(done) {
     getStream(function(err, stream) {
       var lyric = "Kinda counted on you being a friend"
@@ -77,7 +67,7 @@ describe('S3 createWriteStream', function() {
         body += chunk.toString()
       })
 
-      stream.on('end', function() {
+      stream.on('finish', function() {
         body.should.equal(lyric)
         done()
       })
@@ -93,7 +83,7 @@ describe('S3 createWriteStream', function() {
         body += chunk.toString()
       })
 
-      stream.on('end', function(err) {
+      stream.on('finish', function(err) {
         var expected = fs.readFileSync(__filename, 'utf8')
         body.should.equal(expected, 'Did not write file contents correctly')
 
@@ -106,7 +96,7 @@ describe('S3 createWriteStream', function() {
   it('Should handle immediate writes', function(done) {
     var stream = getStream()
 
-    stream.on('end', done)
+    stream.on('finish', done)
     stream.end("Now I thought about what I wanna say")
   })
 
