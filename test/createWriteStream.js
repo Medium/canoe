@@ -58,6 +58,16 @@ describe('S3 createWriteStream', function() {
     })
   })
 
+  it('Should emit "complete" before "finish"', function (done) {
+    getStream(function(err, stream) {
+      stream.once('complete', function () {
+        stream.once('finish', done)
+      })
+
+      stream.end("Shadows on you break out into the light")
+    })
+  })
+
   it('Should error on writes after end', function(done) {
     getStream(function(err, stream) {
       stream.end("'Cause it doesn't happen every day")
