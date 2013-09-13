@@ -132,6 +132,15 @@ describe('S3 createWriteStream', function() {
     getStream().write(bigContent).should.not.be.ok
   })
 
+  it('Should complete upload even if chunk argument to end() is false', function(done) {
+    var stream = getStream()
+    stream.on('complete', done)
+
+    stream.write("Driving this road down to paradise\n")
+    stream.write("Letting the sunlight into my eyes")
+    stream.end(false)
+  })
+
   it('Should finish the chorus', function() {
     var stream = getStream()
     stream.end("So I chained myself to a friend\n'Cause I know it unlocks like a door")
