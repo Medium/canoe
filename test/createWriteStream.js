@@ -58,13 +58,24 @@ describe('S3 createWriteStream', function() {
     })
   })
 
-  it('Should emit "end" event after finish event', function(done) {
+  it('Should emit "complete" before "finish"', function (done) {
     getStream(function(err, stream) {
-      stream.on('finish', function() {
-        stream.on('end', done)
+      stream.once('complete', function () {
+        stream.once('finish', done)
       })
 
-      stream.end("Kinda given up on giving away")
+      stream.end("Shadows on you break out into the light")
+    })
+  })
+
+  it('Should error on writes after end', function(done) {
+    getStream(function(err, stream) {
+      stream.end("'Cause it doesn't happen every day")
+
+      stream.write('Rewind', function(err) {
+        err.should.be.instanceof(Error)
+        done()
+      })
     })
   })
 
@@ -77,7 +88,7 @@ describe('S3 createWriteStream', function() {
         body += chunk.toString()
       })
 
-      stream.on('end', function() {
+      stream.on('finish', function() {
         body.should.equal(lyric)
         done()
       })
@@ -93,7 +104,7 @@ describe('S3 createWriteStream', function() {
         body += chunk.toString()
       })
 
-      stream.on('end', function(err) {
+      stream.on('finish', function(err) {
         var expected = fs.readFileSync(__filename, 'utf8')
         body.should.equal(expected, 'Did not write file contents correctly')
 
@@ -106,7 +117,7 @@ describe('S3 createWriteStream', function() {
   it('Should handle immediate writes', function(done) {
     var stream = getStream()
 
-    stream.on('end', done)
+    stream.on('finish', done)
     stream.end("Now I thought about what I wanna say")
   })
 
@@ -119,6 +130,15 @@ describe('S3 createWriteStream', function() {
     var highWaterMark = getStream()._writableState.highWaterMark
     var bigContent = crypto.randomBytes(highWaterMark)
     getStream().write(bigContent).should.not.be.ok
+  })
+
+  it('Should complete upload even if chunk argument to end() is false', function(done) {
+    var stream = getStream()
+    stream.on('complete', done)
+
+    stream.write("Driving this road down to paradise\n")
+    stream.write("Letting the sunlight into my eyes")
+    stream.end(false)
   })
 
   it('Should finish the chorus', function() {
