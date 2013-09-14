@@ -63,7 +63,7 @@ setInterval(function() {
   maxMemory = Math.max(maxMemory, process.memoryUsage().heapUsed);
 }, 100);
 
-writeable.on('end', function(data) {
+writeable.on('finish', function(data) {
   console.log('Peak memory heap usage was ' + maxMemory + ' bytes');
   process.exit();
 });
