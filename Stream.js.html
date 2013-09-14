@@ -27,9 +27,9 @@
         <article>
             <pre class="prettyprint source"><code>// Copyright 2013 The Obvious Corporation.
 
-var util = require('util');
-var Writable = require('stream').Writable;
-var S3Queue = require('./Queue');
+var util = require('util')
+var Writable = require('stream').Writable
+var S3Queue = require('./Queue')
 
 /**
  * Writable stream interface for S3. Inherits stream.Writable
@@ -42,43 +42,44 @@ var S3Queue = require('./Queue');
  */
 function S3Stream(params, s3) {
   // Initialize the parent stream class
-  Writable.call(this);
+  Writable.call(this)
 
   // Cache inputs
-  this.params = params;
-  this.s3 = s3;
+  this.params = params
+  this.s3 = s3
 
   // Set the stream's initial state, create a queue, and bind event listeners
-  this.init();
+  this.init()
 }
-util.inherits(S3Stream, Writable);
-module.exports = S3Stream;
+util.inherits(S3Stream, Writable)
+module.exports = S3Stream
 
 /**
  * Initialize the instance with default values and listeners
  */
 S3Stream.prototype.init = function () {
   // Setup the stream's initial state and limits
-  this.uploadPartNumber = 0;
-  this.uploadedParts = [];
-  this.activeUploads = 0;
-  this.maxActiveUploads = 1;
+  this.uploadPartNumber = 0
+  this.uploadedParts = []
+  this.activeUploads = 0
+  this.maxActiveUploads = 1
+  this.almostEnding = false
 
   // Setup a queue instance
-  this.setupQueue();
+  this.setupQueue()
 
   // Bind internal listners
-  this.setupEvents();
-};
+  this.setupEvents()
+}
 
 /**
  * Setup an instance of S3Queue and binds the stream's upload()
  * method to the queue's 'drain' event.
  */
 S3Stream.prototype.setupQueue = function () {
-  this.queue = new S3Queue();
-  this.queue.on('drain', this.upload.bind(this));
-};
+  this.queue = new S3Queue()
+  this.queue.on('drain', this.upload.bind(this))
+}
 
 /**
  * Bind internal events.
@@ -87,26 +88,23 @@ S3Stream.prototype.setupQueue = function () {
  * in events instead of nested calls.
  */
 S3Stream.prototype.setupEvents = function () {
-  var _this = this;
-
-  // Complete the upload when the stream's 'finish' event fires
-  this.once('finish', this.complete.bind(this));
+  var _this = this
 
   // By default, abort the upload on any error. Unbind this event with:
   // `s3stream.removeListener('error', s3stream.abort)`
-  this.on('error', this.abort.bind(this));
+  this.on('error', this.abort.bind(this))
 
   // When uploads complete, track the uploaded part and
   // emit drain/flush events
-  this.on('uploaded', this.trackUploadedPart.bind(this));
+  this.on('uploaded', this.trackUploadedPart.bind(this))
   this.on('uploaded', function () {
     // 'drain' is emitted when the stream is writable
-    if (_this.ready()) _this.emit('drain');
+    if (_this.ready()) _this.emit('drain')
 
     // 'flush' is emitted when the stream has no active uploads
-    if (_this.activeUploads === 0) _this.emit('flush');
-  });
-};
+    if (_this.activeUploads === 0) _this.emit('flush')
+  })
+}
 
 /**
  * Abstract stream.Writable method. Writes chunk to the stream.
@@ -117,27 +115,71 @@ S3Stream.prototype.setupEvents = function () {
  * @param {Function} callback Called when the chunk is successfully handled.
  */
 S3Stream.prototype._write = function (chunk, encoding, callback) {
-  var _this = this;
+  var _this = this
 
   // On the queue's `push` event, fire the callback if the queue is ready
   // for more data. If the queue is not ready, fire the callback on the
-  // queue's next `drain` event
+  // queue's next `drain` event. If the stream has been ended, call its
+  // complete() method and run the callback on its `complete` event.
   this.queue.once('push', function () {
-    return _this.ready() ? callback() : _this.once('drain', callback);
-  });
+    if (_this.almostEnding) {
+      _this.once('complete', callback)
+      _this.complete()
+    } else if (_this.ready()) {
+      callback()
+    } else {
+      _this.once('drain', callback)
+    }
+  })
 
   // If the queue is initialized, push this chunk
   if (this.initialized()) {
-    this.queue.push(chunk);
+    this.queue.push(chunk)
 
   // If the queue is not initialized yet, push this chunk when it fires
   // its `writable` event
   } else {
-    this.once('writable', function() {
-      _this.queue.push(chunk);
-    });
+    this.once('writable', function () {
+      _this.queue.push(chunk)
+    })
   }
-};
+}
+
+/**
+ * Subclass stream.Writable.end so that we can set a flag to indicate end()
+ * was called. We use this to know when to complete the upload and avoid
+ * calling _write()'s callback too early.
+ *
+ * @param {(String|Buffer)=} chunk The data to write to the stream.
+ * @param {String=} encoding The encoding, if chunk is a String.
+ * @param {Function=} callback Optional callback for when the stream is finished.
+ */
+S3Stream.prototype.end = function (chunk, encoding, callback) {
+  this.almostEnding = true
+
+  // Borrow some code from Node's _stream_writable.js
+  // https://github.com/joyent/node/blob/v0.10.0-release/lib/_stream_writable.js#L312-L319
+  //
+  // We might need to manipulate chunk. This helps handle cases
+  // where arguments aren't what we think they are.
+  if (typeof chunk === 'function') {
+    callback = chunk
+    chunk = null
+    encoding = null
+  } else if (typeof encoding === 'function') {
+    callback = encoding
+    encoding = null
+  }
+
+  // Make sure chunk is not null-like. This forces the parent's end() to
+  // call write(), which is where we handle completing the upload.
+  if (chunk == null) chunk = ''
+
+  // If no chunk argument is passed at all, create the arg when we call the parent
+  var args = arguments.length ? arguments : [chunk]
+
+  return S3Stream.super_.prototype.end.apply(this, args)
+}
 
 /**
  * Check whether the stream is ready to accept data.
@@ -145,8 +187,8 @@ S3Stream.prototype._write = function (chunk, encoding, callback) {
  * @return {Boolean} True if the stream is ready.
  */
 S3Stream.prototype.ready = function () {
-  return !! (this.initialized() && this.activeUploads &lt; this.maxActiveUploads);
-};
+  return !! (this.initialized() && this.activeUploads &lt; this.maxActiveUploads)
+}
 
 /**
  * Check whether the stream has been initialized with an S3 upload ID.
@@ -154,8 +196,8 @@ S3Stream.prototype.ready = function () {
  * @return {Boolean} True if the stream has an upload ID.
  */
 S3Stream.prototype.initialized = function () {
-  return !! this.params.UploadId;
-};
+  return !! this.params.UploadId
+}
 
 /**
  * Abort the stream's multi-part upload.
@@ -164,9 +206,9 @@ S3Stream.prototype.initialized = function () {
  * the queue so that the zombie parts are not left hanging around S3.
  */
 S3Stream.prototype.abort = function () {
-  this.params.UploadId = null;
-  this.s3.abortMultipartUpload(this.params).send();
-};
+  this.params.UploadId = null
+  this.s3.abortMultipartUpload(this.params).send()
+}
 
 
 /**
@@ -180,14 +222,14 @@ S3Stream.prototype.getUploadParams = function (extraParams) {
     Bucket: this.params.Bucket,
     Key: this.params.Key,
     UploadId: this.params.UploadId
-  };
+  }
 
   Object.keys(extraParams || {}).forEach(function (key) {
-    params[key] = extraParams[key];
-  });
+    params[key] = extraParams[key]
+  })
 
-  return params;
-};
+  return params
+}
 
 /**
  * Upload a chunk of data to S3. Emits an 'uploaded' event on completion.
@@ -195,22 +237,22 @@ S3Stream.prototype.getUploadParams = function (extraParams) {
  * @param {Buffer} body Chunk of data to upload.
  */
 S3Stream.prototype.upload = function (body) {
-  var _this = this;
-  this.uploadPartNumber++;
+  var _this = this
+  this.uploadPartNumber++
 
   var params = this.getUploadParams({
     Body: body,
     PartNumber: this.uploadPartNumber.toString()
-  });
+  })
 
-  this.activeUploads++;
+  this.activeUploads++
   this.s3.uploadPart(params, function (err, response) {
-    _this.activeUploads--;
+    _this.activeUploads--
 
-    if (err) _this.emit('error', err);
-    _this.emit('uploaded', err, response, body);
-  });
-};
+    if (err) _this.emit('error', err)
+    _this.emit('uploaded', err, response, body)
+  })
+}
 
 // ### TrackUploadedPart
 //
@@ -225,41 +267,41 @@ S3Stream.prototype.upload = function (body) {
  * @param {String} data.ETag Entity tag returned when the part was uploaded.
  */
 S3Stream.prototype.trackUploadedPart = function (err, data) {
-  if (err) return;
+  if (err) return
 
   this.uploadedParts.push({
     ETag: data.ETag,
     PartNumber: this.uploadPartNumber
-  });
-};
+  })
+}
 
 /**
  * Finishes a multi-part upload. Any remaning data is flushed from the
  * underlying queue. Once all parts have been uploaded to S3 and the
- * 'flush' event is fired, completion starts. The stream emits an 'end'
+ * 'flush' event is fired, completion starts. The stream emits a 'complete'
  * event when the completed upload finishes with `err` and `response`
  * arguments.
  */
 S3Stream.prototype.complete = function () {
-  var _this = this;
+  var _this = this
 
-  this.queue.drain();
-  this.once('flush', function() {
+  this.queue.drain()
+  this.once('flush', function () {
     // Parts have to be sorted in ascending order
     _this.uploadedParts.sort(function (a, b) {
-      return a.PartNumber &lt; b.PartNumber ? -1 : 1;
-    });
+      return a.PartNumber &lt; b.PartNumber ? -1 : 1
+    })
 
     var params = _this.getUploadParams({
       MultipartUpload: {Parts: _this.uploadedParts}
-    });
+    })
 
     _this.s3.completeMultipartUpload(params, function (err, response) {
-      if (err) _this.emit('error', err);
-      _this.emit('end', err, response);
-    });
-  });
-};
+      if (err) _this.emit('error', err)
+      _this.emit('complete', err, response)
+    })
+  })
+}
 </code></pre>
         </article>
     </section>
@@ -276,7 +318,7 @@ S3Stream.prototype.complete = function () {
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Fri Sep 06 2013 13:22:31 GMT-0700 (PDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0</a> on Sat Sep 14 2013 07:12:28 GMT-0700 (PDT)
 </footer>
 
 <script> prettyPrint(); </script>
