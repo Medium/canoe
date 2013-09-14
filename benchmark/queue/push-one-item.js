@@ -8,10 +8,10 @@ var largeRandomItem = crypto.randomBytes(10000000)
 module.exports = {
   name: 'S3Queue: Push one item',
   tests: {
-    'Push one small item': function() {
+    'Push one small item': function () {
       q.push(randomItem)
     },
-    'Push one large item': function() {
+    'Push one large item': function () {
       q.push(largeRandomItem)
     }
   }
