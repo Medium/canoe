@@ -1,6 +1,10 @@
 {
   // Global
   "passfail": false, // Do not stop on first error.
+  "globals": {
+    "it": false,      // Mocha test cases
+    "describe": false // Mocha test groups
+  },
 
   // Environment
   "node": true,
