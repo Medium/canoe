@@ -1,4 +1,4 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
   var path = require('path')
   var docsRoot = '.grunt/docs'
 
@@ -57,7 +57,7 @@ module.exports = function(grunt) {
       options: {
         jshintrc: './.jshintrc'
       },
-      files: ['index.js', 'lib/*.js']
+      files: ['*.js', '**/*.js', '!node_modules/**/*', '!.*/**/*']
     }
   })
 

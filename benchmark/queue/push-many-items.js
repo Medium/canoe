@@ -7,7 +7,7 @@ var q = new S3Queue()
 var testSizes = ['Big', 'Medium', 'Small']
 
 var randomBytes = {}
-testSizes.forEach(function(size) {
+testSizes.forEach(function (size) {
   randomBytes[size] = []
 })
 var largeChunkSize = 100000
@@ -24,7 +24,7 @@ for (i = 0; i < 100; i++) {
 var tests = {}
 testSizes.forEach(function (testSize) {
   var testName = testSize + ' items'
-  tests[testName] = function() {
+  tests[testName] = function () {
     randomBytes[testSize].forEach(q.push.bind(q))
     q.reset()
   }

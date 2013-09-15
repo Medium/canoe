@@ -8,7 +8,7 @@ var should = require('should')
 var awsShim = require('./shim/aws')
 var S3Utils = require('../index')
 
-var getStream = function(cb) {
+var getStream = function (cb) {
   var s3Shim = new awsShim.S3()
   var s3Utils = new S3Utils(s3Shim)
   var params = {Bucket: 'test-bucket', Key: 'testkey.log'}
@@ -16,9 +16,9 @@ var getStream = function(cb) {
 }
 
 
-describe('S3 createWriteStream', function() {
-  it('Should create writable stream', function(done){
-    var immediateStream = getStream(function(err, stream) {
+describe('S3 createWriteStream', function () {
+  it('Should create writable stream', function (done) {
+    var immediateStream = getStream(function (err, stream) {
       stream.should.be.instanceof(require('stream').Writable)
       immediateStream.should.equal(stream)
 
@@ -28,20 +28,20 @@ describe('S3 createWriteStream', function() {
     immediateStream.should.be.instanceof(require('stream').Writable)
   })
 
-  it('Should be writable', function(done) {
-    getStream(function(err, stream) {
+  it('Should be writable', function (done) {
+    getStream(function (err, stream) {
       stream.write("And we will never be alone again").should.be.ok
       done()
     })
   })
 
-  it('Should emit a "writable" event', function(done) {
+  it('Should emit a "writable" event', function (done) {
     getStream().on('writable', done)
   })
 
-  it('Should emit "uploaded" event', function(done) {
-    getStream(function(err, stream) {
-      stream.on('uploaded', function(err, response, chunk) {
+  it('Should emit "uploaded" event', function (done) {
+    getStream(function (err, stream) {
+      stream.on('uploaded', function (err, response, chunk) {
         response.should.have.property('ETag')
         chunk.should.be.instanceof(Buffer)
 
@@ -51,15 +51,15 @@ describe('S3 createWriteStream', function() {
     })
   })
 
-  it('Should emit "finish" event', function(done) {
-    getStream(function(err, stream) {
+  it('Should emit "finish" event', function (done) {
+    getStream(function (err, stream) {
       stream.on('finish', done)
       stream.end("'Cause it doesn't happen every day")
     })
   })
 
   it('Should emit "complete" before "finish"', function (done) {
-    getStream(function(err, stream) {
+    getStream(function (err, stream) {
       stream.once('complete', function () {
         stream.once('finish', done)
       })
@@ -68,27 +68,27 @@ describe('S3 createWriteStream', function() {
     })
   })
 
-  it('Should error on writes after end', function(done) {
-    getStream(function(err, stream) {
+  it('Should error on writes after end', function (done) {
+    getStream(function (err, stream) {
       stream.end("'Cause it doesn't happen every day")
 
-      stream.write('Rewind', function(err) {
+      stream.write('Rewind', function (err) {
         err.should.be.instanceof(Error)
         done()
       })
     })
   })
 
-  it('Should write data', function(done) {
-    getStream(function(err, stream) {
+  it('Should write data', function (done) {
+    getStream(function (err, stream) {
       var lyric = "Kinda counted on you being a friend"
       var body = ''
 
-      stream.on('uploaded', function(err, response, chunk) {
+      stream.on('uploaded', function (err, response, chunk) {
         body += chunk.toString()
       })
 
-      stream.on('finish', function() {
+      stream.on('finish', function () {
         body.should.equal(lyric)
         done()
       })
@@ -97,14 +97,14 @@ describe('S3 createWriteStream', function() {
     })
   })
 
-  it('Should pipe readable streams', function(done) {
-    getStream(function(err, stream) {
+  it('Should pipe readable streams', function (done) {
+    getStream(function (err, stream) {
       var body = ''
-      stream.on('uploaded', function(err, response, chunk) {
+      stream.on('uploaded', function (err, response, chunk) {
         body += chunk.toString()
       })
 
-      stream.on('finish', function(err) {
+      stream.on('finish', function (err) {
         var expected = fs.readFileSync(__filename, 'utf8')
         body.should.equal(expected, 'Did not write file contents correctly')
 
@@ -114,25 +114,25 @@ describe('S3 createWriteStream', function() {
     })
   })
 
-  it('Should handle immediate writes', function(done) {
+  it('Should handle immediate writes', function (done) {
     var stream = getStream()
 
     stream.on('finish', done)
     stream.end("Now I thought about what I wanna say")
   })
 
-  it('Should run callbacks', function(done) {
+  it('Should run callbacks', function (done) {
     var stream = getStream()
     stream.write("But I never really know where to go", done)
   })
 
-  it('Should return false on writes that overflow the highWaterMark', function() {
+  it('Should return false on writes that overflow the highWaterMark', function () {
     var highWaterMark = getStream()._writableState.highWaterMark
     var bigContent = crypto.randomBytes(highWaterMark)
     getStream().write(bigContent).should.not.be.ok
   })
 
-  it('Should complete upload even if chunk argument to end() is false', function(done) {
+  it('Should complete upload even if chunk argument to end() is false', function (done) {
     var stream = getStream()
     stream.on('complete', done)
 
@@ -141,7 +141,7 @@ describe('S3 createWriteStream', function() {
     stream.end(false)
   })
 
-  it('Should finish the chorus', function() {
+  it('Should finish the chorus', function () {
     var stream = getStream()
     stream.end("So I chained myself to a friend\n'Cause I know it unlocks like a door")
   })

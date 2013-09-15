@@ -13,14 +13,14 @@ module.exports = AWS
 
 var NETWORK_TIMEOUT = 10
 
-AWS.S3 = function() {
+AWS.S3 = function () {
   // An easy way to confirm we're using the shim
   this.shim = true
 }
 
-AWS.S3.prototype.createMultipartUpload = function(params, callback) {
+AWS.S3.prototype.createMultipartUpload = function (params, callback) {
   var _this = this
-  setTimeout(function() {
+  setTimeout(function () {
     var required = ['Bucket', 'Key']
     for (var i = 0; i < required.length; i++) {
       if (params[required[i]] == null)
@@ -35,12 +35,12 @@ AWS.S3.prototype.createMultipartUpload = function(params, callback) {
   }, NETWORK_TIMEOUT)
 }
 
-AWS.S3.prototype.abortMultipartUpload = function(params) {
+AWS.S3.prototype.abortMultipartUpload = function (params) {
   var _this = this
 
   return {
-    send: function(callback) {
-      setTimeout(function() {
+    send: function (callback) {
+      setTimeout(function () {
         if (typeof callback === 'function' && params.UploadId !== _this.cachedUploadId) {
           callback(new Error('UploadId does not match'))
         }
@@ -49,9 +49,9 @@ AWS.S3.prototype.abortMultipartUpload = function(params) {
   }
 }
 
-AWS.S3.prototype.uploadPart = function(params, callback) {
+AWS.S3.prototype.uploadPart = function (params, callback) {
   var _this = this
-  setTimeout(function() {
+  setTimeout(function () {
     var required = ['Body', 'Bucket', 'Key', 'PartNumber']
     for (var i = 0; i < required.length; i++) {
       if (params[required[i]] == null)
@@ -71,9 +71,9 @@ AWS.S3.prototype.uploadPart = function(params, callback) {
   }, NETWORK_TIMEOUT)
 }
 
-AWS.S3.prototype.completeMultipartUpload = function(params, callback) {
+AWS.S3.prototype.completeMultipartUpload = function (params, callback) {
   var _this = this
-  setTimeout(function() {
+  setTimeout(function () {
     var required = ['Bucket', 'Key', 'UploadId', 'MultipartUpload']
     for (var i = 0; i < required.length; i++) {
       if (params[required[i]] == null)
