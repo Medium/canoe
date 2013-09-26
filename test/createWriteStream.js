@@ -8,11 +8,22 @@ var should = require('should')
 var awsShim = require('./shim/aws')
 var S3Utils = require('../index')
 
-var getStream = function (cb) {
+var getStream = function (threshold, cb) {
+  if (typeof threshold === 'function') {
+    cb = threshold;
+    threshold = undefined;
+  }
+
   var s3Shim = new awsShim.S3()
   var s3Utils = new S3Utils(s3Shim)
-  var params = {Bucket: 'test-bucket', Key: 'testkey.log'}
+  var params = {Bucket: 'test-bucket', Key: 'testkey.log', Threshold: threshold}
   return s3Utils.createWriteStream(params, cb)
+}
+
+var getLargeString = function (numMegs) {
+  var charArray = []
+  for (var i = 0; i < numMegs * 1024 * 64; i++) charArray.push('0123456789abcdef')
+  return charArray.join('')
 }
 
 
@@ -49,6 +60,31 @@ describe('S3 createWriteStream', function () {
       })
       stream.end("Somebody tell me if I am sleeping")
     })
+  })
+
+  it('Should perform an upload when data exceeds the threshold', function (done) {
+    getStream(function (err, stream) {
+      stream.on('uploaded', function (err, response, chunk) {
+        response.should.have.property('ETag')
+        chunk.should.be.instanceof(Buffer)
+
+        done(err)
+      })
+      stream.write(getLargeString(10))  // Send in 10MB.
+    })
+  })
+
+  it('Should not perform an upload when size is < custom threshold', function (done) {
+    getStream(function (err, stream) {
+      stream.setThreshold(10 * 1024 * 1024).on('uploaded', function (err, response, chunk) {
+        should.fail('The uploaded event was emitted when data < threshold.')
+        done()
+      })
+      stream.write(getLargeString(5))  // Send in 5MB.
+    })
+    // This test checks for the *lack* of an event, so we wait briefly for that
+    // event, and then call done.
+    setTimeout(done, 1500)
   })
 
   it('Should emit "finish" event', function (done) {
