@@ -63,7 +63,7 @@ describe('S3 createWriteStream', function () {
   })
 
   it('Should perform an upload when data exceeds the threshold', function (done) {
-    getStream(10 * 1024 * 1024 /* threshold */, function (err, stream) {
+    getStream(function (err, stream) {
       stream.on('uploaded', function (err, response, chunk) {
         response.should.have.property('ETag')
         chunk.should.be.instanceof(Buffer)
@@ -75,8 +75,8 @@ describe('S3 createWriteStream', function () {
   })
 
   it('Should not perform an upload when size is < custom threshold', function (done) {
-    getStream(10 * 1024 * 1024 /* threshold */, function (err, stream) {
-      stream.on('uploaded', function (err, response, chunk) {
+    getStream(function (err, stream) {
+      stream.setThreshold(10 * 1024 * 1024).on('uploaded', function (err, response, chunk) {
         should.fail('The uploaded event was emitted when data < threshold.')
         done()
       })
