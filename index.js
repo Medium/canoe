@@ -31,14 +31,11 @@ module.exports = Canoe
  *   fs.createReadStream('./for-good-fun.log').pipe(s3stream)
  *
  * @param {Object} params Params to create an instance of S3Stream
- * @param {Number=} params.Threshold Min bytes to upload in a non-final part.
  * @param {Function=} callback Called when the stream is ready.
  * @return {Stream} Writable stream
  */
 Canoe.prototype.createWriteStream = function (params, callback) {
-  var threshold = params.Threshold
-  delete params.Threshold
-  var s3stream = new S3Stream(params, this.s3, threshold)
+  var s3stream = new S3Stream(params, this.s3)
 
   this.s3.createMultipartUpload(params, function (err, data) {
     // Default callback to a noop
