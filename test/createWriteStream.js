@@ -10,8 +10,8 @@ var S3Utils = require('../index')
 
 var getStream = function (threshold, cb) {
   if (typeof threshold === 'function') {
-    cb = threshold;
-    threshold = undefined;
+    cb = threshold
+    threshold = undefined
   }
 
   var s3Shim = new awsShim.S3()
@@ -85,6 +85,22 @@ describe('S3 createWriteStream', function () {
     // This test checks for the *lack* of an event, so we wait briefly for that
     // event, and then call done.
     setTimeout(done, 1500)
+  })
+
+  it('Should complete even when the data size = threshold', function (done) {
+    getStream(function (err, stream) {
+      stream.setThreshold(5 * 1024 * 1024)
+            .on('complete', done)
+            .write(getLargeString(5))  // Send in 5MB.
+      stream.end()
+    })
+  })
+
+  it('Should complete even when the data size = 0', function (done) {
+    getStream(function (err, stream) {
+      stream.on('complete', done)
+      stream.end()
+    })
   })
 
   it('Should emit "finish" event', function (done) {
