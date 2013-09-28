@@ -9,7 +9,7 @@
   "homepage": "https://github.com/Obvious/canoe",
   "main": "index.js",
   "scripts": {
-    "test": "grunt jshint && mocha test/*.js --reporter spec --check-leaks"
+    "test": "grunt jshint && mocha test/*.js --reporter spec --check-leaks --slow 4000"
   },
   "author": {
     "name": "Evan Solomon",
