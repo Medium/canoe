@@ -1,5 +1,11 @@
 # Changelog
 
+### 0.2.2
+* `S3Stream` -- Fix a bug that caused data to never upload when objects were an exact multiple of the threshold (e.g. 10mb).
+
+### 0.2.1
+* `S3Stream` -- Introduce `S3Stream.setThreshold()` to make the upload threshold easier to customize.
+
 ### 0.2.0
 * `S3Stream` -- Standardize `finish` event to fire once the stream is completely done handling the data. Previously it would fire after the stream's `end()` method was called but before the upload to S3 had completed.
 * `S3Stream` -- Remove `end` event. It is non-standard for writable streams and no longer useful. Use `finish` instead.
