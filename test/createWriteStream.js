@@ -90,8 +90,8 @@ describe('S3 createWriteStream', function () {
   it('Should complete even when the data size = threshold', function (done) {
     getStream(function (err, stream) {
       stream.setThreshold(5 * 1024 * 1024)
-            .on('complete', done)
-            .write(getLargeString(5))  // Send in 5MB.
+        .on('complete', done)
+        .write(getLargeString(5))  // Send in 5MB.
       stream.end()
     })
   })
