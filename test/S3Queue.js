@@ -6,8 +6,9 @@ var S3Queue = require('../lib/Queue')
 var should = require('should')
 
 // Compute this here so Mocha doesn't get annoyed by a slow test
-var q = new S3Queue()
-var bigChunk = crypto.randomBytes(q.threshold())
+var THRESHOLD = 1024
+var q = new S3Queue(THRESHOLD)
+var bigChunk = crypto.randomBytes(q.threshold)
 
 describe('S3Queue', function () {
   it('Should exist', function () {
@@ -25,15 +26,11 @@ describe('S3Queue', function () {
     q.chunks.toString().should.equal('')
   })
 
-  it('Should add chunk', function (done) {
-    var q = new S3Queue()
+  it('Should add chunk', function () {
+    var q = new S3Queue(THRESHOLD)
     var chunk = new Buffer("I know you don't get chance to take a break this often")
-    q.on('push', function (pushed) {
-      var err = chunk === pushed ? null : 'Incorrect chunk added'
-      done(err)
-    })
-
     q.push(chunk)
+    q.chunks.should.not.be.empty
   })
 
   it('Should add multiple chunks', function () {
@@ -48,7 +45,8 @@ describe('S3Queue', function () {
   })
 
   it('Should drain when full', function (done) {
-    var q = new S3Queue()
+    var q = new S3Queue(THRESHOLD)
+    q.setDrainable(true)
     // Make a temp listener to check that drain doesn't fire before it should
     var dontDrainYet = function () {
       done('Drained too early')
@@ -58,7 +56,7 @@ describe('S3Queue', function () {
     q.removeListener('drain', dontDrainYet)
 
     q.on('drain', function (body) {
-      body.length.should.be.above(q.threshold(), 'Drained body length')
+      body.length.should.be.above(q.threshold, 'Drained body length')
       done()
     })
 

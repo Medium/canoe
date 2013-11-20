@@ -3,6 +3,7 @@
 var fs = require('fs')
 var crypto = require('crypto')
 var should = require('should')
+var Writable = require('stream').Writable
 
 // Replace the AWS library with the shim
 var awsShim = require('./shim/aws')
@@ -16,8 +17,8 @@ var getStream = function (threshold, cb) {
 
   var s3Shim = new awsShim.S3()
   var s3Utils = new S3Utils(s3Shim)
-  var params = {Bucket: 'test-bucket', Key: 'testkey.log', Threshold: threshold}
-  return s3Utils.createWriteStream(params, cb)
+  var params = {Bucket: 'test-bucket', Key: 'testkey.log'}
+  return s3Utils.createWriteStream(params, cb, threshold)
 }
 
 var getLargeString = function (numMegs) {
@@ -30,13 +31,13 @@ var getLargeString = function (numMegs) {
 describe('S3 createWriteStream', function () {
   it('Should create writable stream', function (done) {
     var immediateStream = getStream(function (err, stream) {
-      stream.should.be.instanceof(require('stream').Writable)
+      stream.should.be.instanceof(Writable)
       immediateStream.should.equal(stream)
 
       done()
     })
 
-    immediateStream.should.be.instanceof(require('stream').Writable)
+    immediateStream.should.be.instanceof(Writable)
   })
 
   it('Should be writable', function (done) {
@@ -51,7 +52,7 @@ describe('S3 createWriteStream', function () {
   })
 
   it('Should emit "uploaded" event', function (done) {
-    getStream(function (err, stream) {
+    getStream(1024, function (err, stream) {
       stream.on('uploaded', function (err, response, chunk) {
         response.should.have.property('ETag')
         chunk.should.be.instanceof(Buffer)
@@ -87,18 +88,18 @@ describe('S3 createWriteStream', function () {
     setTimeout(done, 1500)
   })
 
-  it('Should complete even when the data size = threshold', function (done) {
+  it('Should close even when the data size = threshold', function (done) {
     getStream(function (err, stream) {
       stream.setThreshold(5 * 1024 * 1024)
-        .on('complete', done)
+        .on('close', done)
         .write(getLargeString(5))  // Send in 5MB.
       stream.end()
     })
   })
 
-  it('Should complete even when the data size = 0', function (done) {
+  it('Should close even when the data size = 0', function (done) {
     getStream(function (err, stream) {
-      stream.on('complete', done)
+      stream.on('close', done)
       stream.end()
     })
   })
@@ -110,10 +111,10 @@ describe('S3 createWriteStream', function () {
     })
   })
 
-  it('Should emit "complete" before "finish"', function (done) {
+  it('Should emit "finish" before "close"', function (done) {
     getStream(function (err, stream) {
-      stream.once('complete', function () {
-        stream.once('finish', done)
+      stream.once('finish', function () {
+        stream.once('close', done)
       })
 
       stream.end("Shadows on you break out into the light")
@@ -140,7 +141,7 @@ describe('S3 createWriteStream', function () {
         body += chunk.toString()
       })
 
-      stream.on('finish', function () {
+      stream.on('close', function () {
         body.should.equal(lyric)
         done()
       })
@@ -156,7 +157,7 @@ describe('S3 createWriteStream', function () {
         body += chunk.toString()
       })
 
-      stream.on('finish', function (err) {
+      stream.on('close', function (err) {
         var expected = fs.readFileSync(__filename, 'utf8')
         body.should.equal(expected, 'Did not write file contents correctly')
 
@@ -184,9 +185,9 @@ describe('S3 createWriteStream', function () {
     getStream().write(bigContent).should.not.be.ok
   })
 
-  it('Should complete upload even if chunk argument to end() is false', function (done) {
+  it('Should complete upload with close event even if chunk argument to end() is false', function (done) {
     var stream = getStream()
-    stream.on('complete', done)
+    stream.on('close', done)
 
     stream.write("Driving this road down to paradise\n")
     stream.write("Letting the sunlight into my eyes")

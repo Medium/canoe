@@ -32,10 +32,12 @@ module.exports = Canoe
  *
  * @param {Object} params Params to create an instance of S3Stream
  * @param {Function=} callback Called when the stream is ready.
+ * @param {number=} threshold Minimum part size to upload; default and smallest valid value is 5MB.
  * @return {Stream} Writable stream
  */
-Canoe.prototype.createWriteStream = function (params, callback) {
+Canoe.prototype.createWriteStream = function (params, callback, threshold) {
   var s3stream = new S3Stream(params, this.s3)
+  if (threshold) s3stream.setThreshold(threshold)
 
   this.s3.createMultipartUpload(params, function (err, data) {
     // Default callback to a noop

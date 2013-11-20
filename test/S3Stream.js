@@ -15,7 +15,7 @@ var getStream = function () {
   return new S3Stream(s3params, s3Shim)
 }
 
-var bigContent = crypto.randomBytes(getStream().queue.threshold())
+var bigContent = crypto.randomBytes(getStream().queue.threshold)
 
 describe('S3Stream', function () {
   it('Should exist', function () {
@@ -51,14 +51,18 @@ describe('S3Stream', function () {
     getStream().write(bigContent).should.not.be.ok
   })
 
-  it('Should not be ready without an UploadId', function () {
+  it('Should have a non-drainable queue before writable event', function () {
     var s3stream = getStream()
-    s3stream.ready().should.not.be.ok
+    s3stream.queue.drainable.should.not.be.ok
   })
 
-  it('Should be ready once an UploadId is set', function () {
+  it('Should have a drainable queue after writable event', function () {
     var s3stream = getStream()
-    s3stream.params.UploadId = 'something'
-    s3stream.ready().should.be.ok
+    s3stream.once('writable', function () {
+      // Call this from setImmediate to give the internal event listener a chance to run first.
+      setImmediate(function () {
+        s3stream.queue.drainable.should.be.ok
+      })
+    })
   })
 })

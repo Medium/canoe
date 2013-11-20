@@ -22,7 +22,7 @@ var canoe = new Canoe(s3);
 
 ## Methods
 
-### createWriteStream
+### createWriteStream(params, [callback], [threshold])
 
 A Node 0.10-friendly writable stream interface ("streams2") for uploading objects to S3.
 
@@ -30,7 +30,14 @@ A Node 0.10-friendly writable stream interface ("streams2") for uploading object
 
 Creates a writable stream for a given S3 bucket/key. The stream will be returned immediately and also passed to an optional callback.
 
-The stream will be writable when it's returned, but not actually ready to send data to S3 yet (data will be buffered internally in the meantime). If you use the immediately returned stream, be sure to respect `false`-y return values, as Node's `readable.pipe()` does. The stream will be fully ready when the callback is run.
+The `params` object is expected to have keys `Bucket` and `Key` to specify the S3 destination. Examples are below.
+
+The optional `callback` function is called once the S3 upload process has been initialized.
+The stream will be immediately writable when it's returned, although data may be buffered until the S3 upload process is initialized.
+If you use the immediately returned stream, be sure to respect `false`-y return values, as Node's `readable.pipe()` does. Data uploads can begin when the callback is run.
+
+The optional `threshold` parameter allows you to set values higher than 5MB for the minimum multipart upload size.  5MB is the default and minimum value accepted by AWS.
+Since there is a 10,000-part maximum, higher thresholds are useful for files that exceed 50,000MB (which is close to, but technically different from, 50GB).
 
 The stream will emit a `writable` event when it's ready to send data to S3.
 
