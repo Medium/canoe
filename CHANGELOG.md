@@ -1,6 +1,7 @@
 # Changelog
 
 ### 0.3.0
+#### November 21, 2013
 * `S3Stream` -- Fix a race condition that caused the upload to be completed to early when `end()` happened to get called while there were no active uploads.
 * `S3Stream` -- Introduce new `close` event, which fires *after* `finish` and means that the data is completely uploaded to S3.
 
