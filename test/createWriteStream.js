@@ -90,7 +90,7 @@ describe('S3 createWriteStream', function () {
   it('Should complete even when the data size = threshold', function (done) {
     getStream(function (err, stream) {
       stream.setThreshold(5 * 1024 * 1024)
-        .on('complete', done)
+        .on('close', done)
         .write(getLargeString(5))  // Send in 5MB.
       stream.end()
     })
@@ -98,7 +98,7 @@ describe('S3 createWriteStream', function () {
 
   it('Should complete even when the data size = 0', function (done) {
     getStream(function (err, stream) {
-      stream.on('complete', done)
+      stream.on('close', done)
       stream.end()
     })
   })
@@ -110,10 +110,10 @@ describe('S3 createWriteStream', function () {
     })
   })
 
-  it('Should emit "complete" before "finish"', function (done) {
+  it('Should emit "close" after "finish"', function (done) {
     getStream(function (err, stream) {
-      stream.once('complete', function () {
-        stream.once('finish', done)
+      stream.once('finish', function () {
+        stream.once('close', done)
       })
 
       stream.end("Shadows on you break out into the light")
@@ -140,7 +140,7 @@ describe('S3 createWriteStream', function () {
         body += chunk.toString()
       })
 
-      stream.on('finish', function () {
+      stream.on('close', function () {
         body.should.equal(lyric)
         done()
       })
@@ -156,7 +156,7 @@ describe('S3 createWriteStream', function () {
         body += chunk.toString()
       })
 
-      stream.on('finish', function (err) {
+      stream.on('close', function (err) {
         var expected = fs.readFileSync(__filename, 'utf8')
         body.should.equal(expected, 'Did not write file contents correctly')
 
@@ -169,7 +169,7 @@ describe('S3 createWriteStream', function () {
   it('Should handle immediate writes', function (done) {
     var stream = getStream()
 
-    stream.on('finish', done)
+    stream.on('close', done)
     stream.end("Now I thought about what I wanna say")
   })
 
@@ -186,7 +186,7 @@ describe('S3 createWriteStream', function () {
 
   it('Should complete upload even if chunk argument to end() is false', function (done) {
     var stream = getStream()
-    stream.on('complete', done)
+    stream.on('close', done)
 
     stream.write("Driving this road down to paradise\n")
     stream.write("Letting the sunlight into my eyes")

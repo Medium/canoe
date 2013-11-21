@@ -32,7 +32,7 @@ Creates a writable stream for a given S3 bucket/key. The stream will be returned
 
 The stream will be writable when it's returned, but not actually ready to send data to S3 yet (data will be buffered internally in the meantime). If you use the immediately returned stream, be sure to respect `false`-y return values, as Node's `readable.pipe()` does. The stream will be fully ready when the callback is run.
 
-The stream will emit a `writable` event when it's ready to send data to S3.
+The stream will emit a `writable` event when it's ready to send data to S3. A `close` event will be emitted when the stream is fully done consuming (uploading) the data; this will happen *after* the `finish` event.
 
 Basic usage:
 
@@ -63,7 +63,7 @@ setInterval(function() {
   maxMemory = Math.max(maxMemory, process.memoryUsage().heapUsed);
 }, 100);
 
-writeable.on('finish', function(data) {
+writeable.on('close', function(data) {
   console.log('Peak memory heap usage was ' + maxMemory + ' bytes');
   process.exit();
 });
