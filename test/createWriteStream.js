@@ -6,7 +6,7 @@ var should = require('should')
 
 // Replace the AWS library with the shim
 var awsShim = require('./shim/aws')
-var S3Utils = require('../index')
+var Canoe = require('../index')
 
 var getStream = function (threshold, cb) {
   if (typeof threshold === 'function') {
@@ -15,9 +15,9 @@ var getStream = function (threshold, cb) {
   }
 
   var s3Shim = new awsShim.S3()
-  var s3Utils = new S3Utils(s3Shim)
+  var canoe = new Canoe(s3Shim)
   var params = {Bucket: 'test-bucket', Key: 'testkey.log', Threshold: threshold}
-  return s3Utils.createWriteStream(params, cb)
+  return canoe.createWriteStream(params, cb)
 }
 
 var getLargeString = function (numMegs) {
