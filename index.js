@@ -30,11 +30,18 @@ module.exports = Canoe
  *   })
  *   fs.createReadStream('./for-good-fun.log').pipe(s3stream)
  *
- * @param {Object} params Params to create an instance of S3Stream
+ * @param {Object=} params Params to create an instance of S3Stream. Matches params
+ *   from AWS.S3.createMultipartUpload().
  * @param {Function=} callback Called when the stream is ready.
  * @return {Stream} Writable stream
  */
 Canoe.prototype.createWriteStream = function (params, callback) {
+  // Handle createWriteStream(fn)
+  if (typeof params === 'function') {
+    callback = params
+    params = null
+  }
+
   var s3stream = new S3Stream(params, this.s3)
 
   this.s3.createMultipartUpload(params, function (err, data) {

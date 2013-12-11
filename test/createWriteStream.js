@@ -39,6 +39,16 @@ describe('S3 createWriteStream', function () {
     immediateStream.should.be.instanceof(require('stream').Writable)
   })
 
+  it('Should support optional parameters', function (done) {
+    var s3Shim = new awsShim.S3({params: {
+      Bucket: 'another-bucket',
+      Key: 'another-file'
+    }})
+    var canoe = new Canoe(s3Shim)
+
+    canoe.createWriteStream(done)
+  })
+
   it('Should be writable', function (done) {
     getStream(function (err, stream) {
       stream.write("And we will never be alone again").should.be.ok
