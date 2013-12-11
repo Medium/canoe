@@ -13,13 +13,25 @@ module.exports = AWS
 
 var NETWORK_TIMEOUT = 10
 
-AWS.S3 = function () {
+AWS.S3 = function (opts) {
+  opts = opts || {}
+
   // An easy way to confirm we're using the shim
   this.shim = true
+
+  this.defaultParams = opts.params || {}
 }
 
 AWS.S3.prototype.createMultipartUpload = function (params, callback) {
   var _this = this
+
+  // Merge default params
+  params = params || {}
+  for (var key in this.defaultParams) {
+    if (! this.defaultParams.hasOwnProperty(key)) continue;
+    params[key] = params[key] || this.defaultParams[key]
+  }
+
   setTimeout(function () {
     var required = ['Bucket', 'Key']
     for (var i = 0; i < required.length; i++) {
