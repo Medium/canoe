@@ -78,6 +78,12 @@ describe('AWS Shim, testing the tests', function () {
         done(err)
       })
     })
+
+    it('Should support default parameters', function (done) {
+      // No bucket is passed when the upload is created
+      var s3shim = new awsShim.S3({params: {Bucket: 'new-bucket'}})
+      s3shim.createMultipartUpload({Key: 'another-file'}, done)
+    })
   })
 
 
