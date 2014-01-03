@@ -144,19 +144,45 @@ describe('AWS Shim, testing the tests', function () {
       })
     })
 
-    it('Should fail if the PartNumber is not a string', function (done) {
-      var params = {Bucket: 'test-bucket', Key: 'test-file'}
-      s3shim().createMultipartUpload(params, function (err, data) {
-        params.Body = new Buffer("What keeps the planet spinning")
-        params.PartNumber = 1
-        params.UploadId = data.UploadId
+    // The AWS SDK has had different type validation for the PartNumber param in
+    // different versions. Since Canoe doesn't have a reference to the root AWS
+    // object it has no way to tell what version is being used. Let's try to
+    // we handle whatever is thrown at us.
+    //
+    // * <= 1.14.0 requires a string
+    // * 1.15.0 - 1.17.0 and 2.0.0-rc1 - 2.0.0-rc5 require numbers
+    // * > 1.17.0 and > 2.0.0-rc5 are type agnostic
+    //
+    // See: https://github.com/Obvious/canoe/pull/22
+    it('Should fail if PartNumber type validation is required and does not match', function (done) {
+      function testCase(partNumVal, partNumRequiredType, cb) {
+        var params = {Bucket: 'test-bucket', Key: 'test-file'}
+        var s3 = s3shim()
+        s3.requireUploadPartType = partNumRequiredType
+        s3.createMultipartUpload(params, function (err, data) {
+          params.Body = new Buffer("What keeps the planet spinning")
+          params.PartNumber = partNumVal
+          params.UploadId = data.UploadId
 
-        s3shim().uploadPart(params, function (err, data) {
-          err.should.be.instanceof(Error)
-          err.message.should.equal('PartNumber must be a String')
-          done()
+          s3.uploadPart(params, function (err, data) {
+            err.should.be.instanceof(Error)
+            err.message.should.equal('PartNumber must be a ' + partNumRequiredType)
+            cb()
+          })
         })
-      })
+      }
+
+      async.parallel([
+        // Require a string
+        function (cb) {
+          testCase(1, 'string', cb)
+        },
+
+        // Require a number
+        function (cb) {
+          testCase('1', 'number', cb)
+        }
+      ], done)
     })
 
     it('Should require params', function (done) {
