@@ -16,6 +16,9 @@ var NETWORK_TIMEOUT = 10
 AWS.S3 = function () {
   // An easy way to confirm we're using the shim
   this.shim = true
+
+  // https://github.com/Obvious/canoe/pull/22
+  this.requireUploadPartType = null
 }
 
 AWS.S3.prototype.createMultipartUpload = function (params, callback) {
@@ -58,8 +61,11 @@ AWS.S3.prototype.uploadPart = function (params, callback) {
         return callback(new Error(required[i] + ' is required'))
     }
 
-    if (typeof params.PartNumber !== 'string') {
-      return callback(new Error('PartNumber must be a String'))
+    // The PartNumber param is type agnostic. It used to be strict, but inconsistent.
+    //
+    // https://github.com/Obvious/canoe/pull/22
+    if (_this.requireUploadPartType && typeof params.PartNumber !== _this.requireUploadPartType) {
+      return callback(new Error('PartNumber must be a ' + _this.requireUploadPartType))
     }
 
     if (params.UploadId !== _this.cachedUploadId) {

@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.3.1
+#### January 3, 2014
+* `S3Stream` -- Handle inconsistent type checking for `PartNumber` param in the AWS SDK. Allows Canoe to work with AWS versions that would previously have thrown errors on every upload (1.15.0 - 1.17.0 and 2.0.0-rc1 - 2.0.0-rc5).
+
 ### 0.3.0
 #### November 21, 2013
 * `S3Stream` -- Fix a race condition that caused the upload to be completed to early when `end()` happened to get called while there were no active uploads.
