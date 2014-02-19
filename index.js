@@ -1,6 +1,7 @@
 // Copyright 2013 The Obvious Corporation.
 
 var S3Stream = require('./lib/Stream')
+var CombinedReadable = require('./lib/CombinedReadable')
 
 /**
  * Helper functionality for working with S3.
@@ -60,4 +61,41 @@ Canoe.prototype.createWriteStream = function (params, callback) {
 
   // Return the write stream
   return s3stream
+}
+
+/**
+ * Stream objects by prefix.
+ *
+ * @example
+ *   var canoe = new Canoe(s3)
+ *   var params = {Bucket: 'stuff', Key: 'path/to/things/'}
+ *   canoe.createPrefixedReadStream(params, function (err, readable) {
+ *     readable.pipe(process.stdout)
+ *   })
+ *
+ * @param {Object} params Parameters to list objects
+ * @param {String} params.Bucket The S3 bucket to download from
+ * @param {String} params.Prefix The S3 prefix to download from
+ * @param {Function} callback Called with error, stream
+ */
+Canoe.prototype.createPrefixedReadStream = function (params, callback) {
+  var streams = []
+  this.s3.listObjects(params).eachItem(function (err, data) {
+    if (err) {
+      return callback(err)
+    }
+
+    // null data without an error indicates no more paging
+    if (data === null) {
+      var composed = new CombinedReadable(streams)
+      return callback(null, composed)
+    }
+
+    var req = this.s3.getObject({
+      Bucket: params.Bucket,
+      Key: data.Key
+    })
+
+    streams.push(req.createReadStream())
+  }.bind(this))
 }
