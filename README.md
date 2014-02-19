@@ -22,6 +22,26 @@ var canoe = new Canoe(s3);
 
 ## Methods
 
+### createPrefixedReadStream
+
+Create a readable stream of all objects whose keys match a given prefix.
+
+#### Usage
+
+Combines multiple objects into a single readable stream, preserving the order of the objects.
+
+```javascript
+// This will stream all objects starting with "path/to/things/name_"
+// For example, it would match "path/to/things/name_1", "path/to/things/name_2", etc
+canoe.createPrefixedReadStream({
+  Bucket: 'bucket-name',
+  Prefix: 'path/to/things/name_'
+}, function (err, readable) {
+  readable.pipe(process.stdout)
+})
+```
+
+
 ### createWriteStream
 
 A Node 0.10-friendly writable stream interface ("streams2") for uploading objects to S3.
