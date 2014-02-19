@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.3.2
+#### February 19, 2014
+* Introduce `createPrefixedReadStream()` -- Downloads all S3 objects matching a given prefix as a single readable stream.
+
 ### 0.3.1
 #### January 3, 2014
 * `S3Stream` -- Handle inconsistent type checking for `PartNumber` param in the AWS SDK. Allows Canoe to work with AWS versions that would previously have thrown errors on every upload (1.15.0 - 1.17.0 and 2.0.0-rc1 - 2.0.0-rc5).
