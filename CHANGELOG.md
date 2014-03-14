@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.3.3
+#### March 14, 2014
+* Fix bug in handling backpressure in `createPrefixedReadStream()`. The returned stream is now an instance of `stream.PassThrough` and source streams from S3 are piped to it serially.
+
 ### 0.3.2
 #### February 19, 2014
 * Introduce `createPrefixedReadStream()` -- Downloads all S3 objects matching a given prefix as a single readable stream.
