@@ -4,7 +4,9 @@ var async = require('async')
 var should = require('should')
 
 var awsShim = require('./shim/aws')
-var s3shim = function () { return new awsShim.S3() }
+var s3shim = function () {
+  return new awsShim.S3()
+}
 
 // Basic existance
 describe('AWS Shim, testing the tests', function () {
@@ -50,7 +52,10 @@ describe('AWS Shim, testing the tests', function () {
     })
 
     it('Should require Bucket and Key params', function (done) {
-      var getParams = function () { return {Bucket: 'test-bucket', Key: 'test-file'} }
+      var getParams = function () {
+        return {Bucket: 'test-bucket', Key: 'test-file'}
+      }
+
       async.each(['Bucket', 'Key'], function (key, cb) {
         var params = getParams()
         delete params[key]

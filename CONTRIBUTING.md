@@ -18,7 +18,7 @@ During development, you can run `grunt watch` to automatically run tests, run JS
 
 ### Code style
 
-There is no formal style guide, but your code should pass JS Hint (part of the default `grunt` task). When in doubt, try to follow existing convenetions and these basic rules:
+There is no formal style guide, but there are style conventions enforced by both JSHint and JSCS. Both JSHint and JSCS  are part of the default `grunt` task and CI build process. When in doubt, try to follow existing convenetions and these basic rules:
 
 * Don't use semi-colons. We think our code looks sleeker without them.
 * Indent using two spaces. Never use tabs.

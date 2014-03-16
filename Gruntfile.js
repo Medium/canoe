@@ -9,6 +9,8 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-gh-pages')
   grunt.loadNpmTasks('grunt-benchmark')
   grunt.loadNpmTasks('grunt-release')
+  grunt.loadNpmTasks('grunt-jscs-checker')
+  grunt.loadNpmTasks('grunt-parallel')
 
   grunt.initConfig({
     watch: {
@@ -44,8 +46,8 @@ module.exports = function (grunt) {
       }
     },
     exec: {
-      test: {
-        command: 'npm test'
+      mocha: {
+        command: './node_modules/.bin/mocha test/*.js --reporter spec --check-leaks'
       },
       docsIndex: {
         // The default index page is mostly empty and confusing
@@ -58,10 +60,25 @@ module.exports = function (grunt) {
         jshintrc: './.jshintrc'
       },
       files: ['*.js', '**/*.js', '!node_modules/**/*', '!.*/**/*']
+    },
+    jscs: {
+      src: ['*.js', '**/*.js', '!node_modules/**/*', '!.*/**/*'],
+      options: {
+        config: '.jscsrc'
+      }
+    },
+    parallel: {
+      test: {
+        options: {
+          grunt: true
+        },
+        tasks: ['jshint', 'jscs', 'exec:mocha']
+      }
     }
   })
 
-  grunt.registerTask('default', ['jshint', 'exec:test', 'docs'])
+  grunt.registerTask('test', 'parallel:test')
+  grunt.registerTask('default', ['test', 'docs'])
   grunt.registerTask('docs', ['jsdoc:docs', 'exec:docsIndex'])
 
   grunt.registerTask('publish', 'Publish a new version, defaults to patch', function (type) {

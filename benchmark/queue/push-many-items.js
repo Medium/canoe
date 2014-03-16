@@ -12,7 +12,9 @@ testSizes.forEach(function (size) {
 })
 var largeChunkSize = 100000
 
-var i, j, factor
+var i
+var j
+var factor
 for (i = 0; i < 100; i++) {
   factor = 1
   testSizes.forEach(function (size) {
