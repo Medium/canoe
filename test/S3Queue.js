@@ -1,4 +1,4 @@
-// Copyright 2012 The Obvious Corporation.
+// Copyright 2014 A Medium Corporation.
 
 var events = require('events')
 var crypto = require('crypto')

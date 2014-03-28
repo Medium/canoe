@@ -1,4 +1,4 @@
-// Copyright 2013 The Obvious Corporation.
+// Copyright 2014 A Medium Corporation.
 
 // Testable shim for the AWS SDK
 //
@@ -17,7 +17,7 @@ AWS.S3 = function () {
   // An easy way to confirm we're using the shim
   this.shim = true
 
-  // https://github.com/Obvious/canoe/pull/22
+  // https://github.com/Medium/canoe/pull/22
   this.requireUploadPartType = null
 }
 
@@ -63,7 +63,7 @@ AWS.S3.prototype.uploadPart = function (params, callback) {
 
     // The PartNumber param is type agnostic. It used to be strict, but inconsistent.
     //
-    // https://github.com/Obvious/canoe/pull/22
+    // https://github.com/Medium/canoe/pull/22
     if (_this.requireUploadPartType && typeof params.PartNumber !== _this.requireUploadPartType) {
       return callback(new Error('PartNumber must be a ' + _this.requireUploadPartType))
     }

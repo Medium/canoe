@@ -1,6 +1,6 @@
 # Canoe
 
-[![Build Status](https://secure.travis-ci.org/Obvious/canoe.png?branch=master)](http://travis-ci.org/Obvious/canoe)
+[![Build Status](https://secure.travis-ci.org/Medium/canoe.png?branch=master)](http://travis-ci.org/Medium/canoe)
 
 Paddle downstream with Canoe, an S3 utility library for Node.js. Built on the [AWS Node SDK](https://github.com/aws/aws-sdk-js).
 
@@ -115,15 +115,15 @@ canoe.createWriteStream(s3Params, function(err, writable) {
 
 ## Contributing
 
-See the [contributing documentation](https://github.com/Obvious/canoe/tree/master/CONTRIBUTING.md).
+See the [contributing documentation](https://github.com/Medium/canoe/tree/master/CONTRIBUTING.md).
 
 ## Author
 
-[Evan Solomon](https://github.com/evansolomon) ([personal website](http://evansolomon.me/)), supported by [The Obvious Corporation](http://obvious.com/).
+[Evan Solomon](https://github.com/evansolomon) ([personal website](http://evansolomon.me/)), supported by [A Medium Corporation](http://medium.com/).
 
 ## License
 
-Copyright 2013 [The Obvious Corporation](http://obvious.com/).
+Copyright 2013 [A Medium Corporation](http://medium.com/).
 
 Licensed under the Apache License, Version 2.0. See the top-level file `LICENSE.txt` and (http://www.apache.org/licenses/LICENSE-2.0).
 

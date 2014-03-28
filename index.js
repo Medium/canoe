@@ -1,4 +1,4 @@
-// Copyright 2013 The Obvious Corporation.
+// Copyright 2014 A Medium Corporation.
 
 var S3Stream = require('./lib/Stream')
 var CombinedReadable = require('./lib/CombinedReadable')

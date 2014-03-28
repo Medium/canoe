@@ -33,7 +33,7 @@
   "strict": false,   // This option enables strict mode for function scope only
   "maxerr": 1000,
 
-  // Obvious style preferences.
+  // Medium style preferences.
   "newcap": true,     // Require capitalization of all constructor functions e.g. `new F()`.
   "noempty": false,   // Prohibit use of empty blocks.
   "nonew": true,      // Prohibit use of constructors for side-effects.

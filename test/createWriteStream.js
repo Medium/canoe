@@ -1,4 +1,4 @@
-// Copyright 2013 The Obvious Corporation.
+// Copyright 2014 A Medium Corporation.
 
 var fs = require('fs')
 var crypto = require('crypto')

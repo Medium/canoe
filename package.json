@@ -6,7 +6,7 @@
   },
   "engineStrict": true,
   "description": "S3 utility library",
-  "homepage": "https://github.com/Obvious/canoe",
+  "homepage": "https://github.com/Medium/canoe",
   "main": "index.js",
   "scripts": {
     "test": "grunt test"
@@ -25,7 +25,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Obvious/canoe.git"
+    "url": "https://github.com/Medium/canoe.git"
   },
   "license": {
     "type": "Apache 2.0",

@@ -1,4 +1,4 @@
-// Copyright 2013 The Obvious Corporation.
+// Copyright 2014 A Medium Corporation.
 
 var async = require('async')
 var should = require('should')
@@ -158,7 +158,7 @@ describe('AWS Shim, testing the tests', function () {
     // * 1.15.0 - 1.17.0 and 2.0.0-rc1 - 2.0.0-rc5 require numbers
     // * > 1.17.0 and > 2.0.0-rc5 are type agnostic
     //
-    // See: https://github.com/Obvious/canoe/pull/22
+    // See: https://github.com/Medium/canoe/pull/22
     it('Should fail if PartNumber type validation is required and does not match', function (done) {
       function testCase(partNumVal, partNumRequiredType, cb) {
         var params = {Bucket: 'test-bucket', Key: 'test-file'}
